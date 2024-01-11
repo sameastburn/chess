@@ -68,15 +68,9 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         var moves = new HashSet<ChessMove>();
 
-        /*
-        e.g. from validMoves generator
-        for (var endPosition : endPositions) {
-            validMoves.add(TestFactory.getNewMove(startPosition,
-                    TestFactory.getNewPosition(endPosition[0], endPosition[1]), null));
-                    }
-         */
-
         var thisType = getPieceType();
+        var row = myPosition.getRow();
+        var col = myPosition.getColumn();
 
         switch(thisType) {
             case KING:
@@ -94,8 +88,37 @@ public class ChessPiece {
                 // a bishop moves diagonally, so that's a possible four directions
                 // let's calculate each direction individually
 
-                ;
-                ;
+                // top left
+                for (int i = row - 1, j = col - 1; i >= 1 && j >= 1; i--, j--) {
+                    var newEndPosition = new ChessPosition(i, j);
+                    var newMove = new ChessMove(myPosition, newEndPosition, null);
+
+                    moves.add(newMove);
+                }
+
+                // top right
+                for (int i = row - 1, j = col + 1; i >= 1 && j <= 8; i--, j++) {
+                    var newEndPosition = new ChessPosition(i, j);
+                    var newMove = new ChessMove(myPosition, newEndPosition, null);
+
+                    moves.add(newMove);
+                }
+
+                // bottom left
+                for (int i = row + 1, j = col - 1; i <= 8 && j >= 1; i++, j--) {
+                    var newEndPosition = new ChessPosition(i, j);
+                    var newMove = new ChessMove(myPosition, newEndPosition, null);
+
+                    moves.add(newMove);
+                }
+
+                // bottom right
+                for (int i = row + 1, j = col + 1; i <= 8 && j <= 8; i++, j++) {
+                    var newEndPosition = new ChessPosition(i, j);
+                    var newMove = new ChessMove(myPosition, newEndPosition, null);
+
+                    moves.add(newMove);
+                }
 
                 break;
             }
