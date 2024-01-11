@@ -10,7 +10,10 @@ public class ChessBoard {
     private ChessPiece[][] board;
 
     public ChessBoard() {
-        board = new ChessPiece[8][8];
+        // we will express positions as [1-8]...
+        // this is kind of a lame solution, could hack ChessPosition, but
+        // this should be good enough for this project
+        board = new ChessPiece[9][9];
     }
 
     /**

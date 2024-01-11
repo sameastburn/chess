@@ -66,10 +66,72 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        var test = new HashSet<ChessMove>();
+        var moves = new HashSet<ChessMove>();
 
-        return test;
+        /*
+        e.g. from validMoves generator
+        for (var endPosition : endPositions) {
+            validMoves.add(TestFactory.getNewMove(startPosition,
+                    TestFactory.getNewPosition(endPosition[0], endPosition[1]), null));
+                    }
+         */
 
-        //throw new RuntimeException("Not implemented");
+        var thisType = getPieceType();
+
+        switch(thisType) {
+            case KING:
+            {
+                break;
+            }
+            case QUEEN:
+            {
+                ;
+
+                break;
+            }
+            case BISHOP:
+            {
+                // a bishop moves diagonally, so that's a possible four directions
+                // let's calculate each direction individually
+
+                ;
+                ;
+
+                break;
+            }
+            case KNIGHT:
+            {
+                ;
+                ;
+                ;
+
+                break;
+            }
+            case ROOK:
+            {
+                ;
+                ;
+                ;
+                ;
+
+                break;
+            }
+            case PAWN:
+            {
+                ;
+                ;
+                ;
+                ;
+                ;
+
+                break;
+            }
+            default:
+            {
+                throw new RuntimeException("[ChessPiece.pieceMoves] irregular piece tried to move!");
+            }
+        }
+
+        return moves;
     }
 }
