@@ -119,3 +119,8 @@ modules.xml
 .idea/**/azureSettings.xml
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij
+
+# don't need compilations
+client/target/
+server/target/
+shared/target/
