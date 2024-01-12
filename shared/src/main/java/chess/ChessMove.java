@@ -17,11 +17,7 @@ public class ChessMove {
         if (o == null || getClass() != o.getClass()) return false;
         ChessMove chessMove=(ChessMove) o;
 
-        boolean startEquals = start.equals(chessMove.start);
-        boolean endEquals = end.equals(chessMove.end);
-        boolean promotionEquals = promotion == chessMove.promotion;
-
-        return startEquals && endEquals && promotionEquals;
+        return start.equals(chessMove.start) && end.equals(chessMove.end) && promotion == chessMove.promotion;
     }
 
     @Override

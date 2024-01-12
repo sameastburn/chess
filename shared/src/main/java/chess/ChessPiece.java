@@ -58,6 +58,130 @@ public class ChessPiece {
         return Objects.hash(color, type);
     }
 
+    private Collection<ChessMove> kingMoves(ChessBoard board, ChessPosition myPosition) {
+        var moves = new HashSet<ChessMove>();
+
+        var thisColor = getTeamColor();
+        var row = myPosition.getRow();
+        var col = myPosition.getColumn();
+
+        // took an iterative approach this time because this function would have been really long
+        int[][] directions = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
+
+        for (int[] direction : directions) {
+            int newRow = row + direction[0];
+            int newCol = col + direction[1];
+
+            if (newRow >= 1 && newRow <= 8 && newCol >= 1 && newCol <= 8) {
+                var newEndPosition = new ChessPosition(newRow, newCol);
+                var newMove = new ChessMove(myPosition, newEndPosition, null);
+
+                var possibleCollision = board.hasPieceAt(newEndPosition);
+                if (possibleCollision) {
+                    var collisionPiece = board.getPiece(newEndPosition);
+
+                    // if we collide with another piece, if it's an enemy it's a possible move
+                    // however if it's one of our own pieces, we cannot capture our own pieces
+                    if (collisionPiece.getTeamColor() != thisColor) {
+                        moves.add(newMove);
+                    }
+                } else {
+                    moves.add(newMove);
+                }
+            }
+        }
+
+        return moves;
+    }
+
+    private HashSet<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition) {
+        var moves = new HashSet<ChessMove>();
+
+        var thisColor = getTeamColor();
+        var row = myPosition.getRow();
+        var col = myPosition.getColumn();
+
+        // a bishop moves diagonally, so that's a possible four directions
+        // let's calculate each direction individually
+
+        // bottom left
+        for (int i = row - 1, j = col - 1; i >= 1 && j >= 1; i--, j--) {
+            var newEndPosition = new ChessPosition(i, j);
+            var newMove = new ChessMove(myPosition, newEndPosition, null);
+
+            var possibleCollision = board.hasPieceAt(newEndPosition);
+            if (possibleCollision) {
+                var collisionPiece = board.getPiece(newEndPosition);
+
+                // if we collide with another piece, if it's an enemy it's a possible move
+                // however if it's one of our own pieces, we cannot capture our own pieces
+                if (collisionPiece.getTeamColor() != thisColor) {
+                    moves.add(newMove);
+                }
+
+                break;
+            }
+
+            moves.add(newMove);
+        }
+
+        // bottom right
+        for (int i = row - 1, j = col + 1; i >= 1 && j <= 8; i--, j++) {
+            var newEndPosition = new ChessPosition(i, j);
+            var newMove = new ChessMove(myPosition, newEndPosition, null);
+
+            var possibleCollision = board.hasPieceAt(newEndPosition);
+            if (possibleCollision) {
+                var collisionPiece = board.getPiece(newEndPosition);
+                if (collisionPiece.getTeamColor() != thisColor) {
+                    moves.add(newMove);
+                }
+
+                break;
+            }
+
+            moves.add(newMove);
+        }
+
+        // top left
+        for (int i = row + 1, j = col - 1; i <= 8 && j >= 1; i++, j--) {
+            var newEndPosition = new ChessPosition(i, j);
+            var newMove = new ChessMove(myPosition, newEndPosition, null);
+
+            var possibleCollision = board.hasPieceAt(newEndPosition);
+            if (possibleCollision) {
+                var collisionPiece = board.getPiece(newEndPosition);
+                if (collisionPiece.getTeamColor() != thisColor) {
+                    moves.add(newMove);
+                }
+
+                break;
+            }
+
+            moves.add(newMove);
+        }
+
+        // top right
+        for (int i = row + 1, j = col + 1; i <= 8 && j <= 8; i++, j++) {
+            var newEndPosition = new ChessPosition(i, j);
+            var newMove = new ChessMove(myPosition, newEndPosition, null);
+
+            var possibleCollision = board.hasPieceAt(newEndPosition);
+            if (possibleCollision) {
+                var collisionPiece = board.getPiece(newEndPosition);
+                if (collisionPiece.getTeamColor() != thisColor) {
+                    moves.add(newMove);
+                }
+
+                break;
+            }
+
+            moves.add(newMove);
+        }
+
+        return moves;
+    }
+
     /**
      * Calculates all the positions a chess piece can move to
      * Does not take into account moves that are illegal due to leaving the king in
@@ -66,137 +190,16 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        var moves = new HashSet<ChessMove>();
-
-        var thisType = getPieceType();
-        var thisColor = getTeamColor();
-        var row = myPosition.getRow();
-        var col = myPosition.getColumn();
-
-        switch(thisType) {
-            case KING:
-            {
-                break;
-            }
-            case QUEEN:
-            {
-                ;
-
-                break;
-            }
-            case BISHOP:
-            {
-                // a bishop moves diagonally, so that's a possible four directions
-                // let's calculate each direction individually
-                // fun fact: the directions were wrong but the math was right
-
-                // bottom left
-                for (int i = row - 1, j = col - 1; i >= 1 && j >= 1; i--, j--) {
-                    var newEndPosition = new ChessPosition(i, j);
-                    var newMove = new ChessMove(myPosition, newEndPosition, null);
-
-                    var possibleCollision = board.hasPieceAt(newEndPosition);
-                    if (possibleCollision) {
-                        var collisionPiece = board.getPiece(newEndPosition);
-                        if (collisionPiece.getTeamColor() != thisColor) {
-                            moves.add(newMove);
-                        }
-
-                        break;
-                    }
-
-                    moves.add(newMove);
-                }
-
-                // bottom right
-                for (int i = row - 1, j = col + 1; i >= 1 && j <= 8; i--, j++) {
-                    var newEndPosition = new ChessPosition(i, j);
-                    var newMove = new ChessMove(myPosition, newEndPosition, null);
-
-                    var possibleCollision = board.hasPieceAt(newEndPosition);
-                    if (possibleCollision) {
-                        var collisionPiece = board.getPiece(newEndPosition);
-                        if (collisionPiece.getTeamColor() != thisColor) {
-                            moves.add(newMove);
-                        }
-
-                        break;
-                    }
-
-                    moves.add(newMove);
-                }
-
-                // top left
-                for (int i = row + 1, j = col - 1; i <= 8 && j >= 1; i++, j--) {
-                    var newEndPosition = new ChessPosition(i, j);
-                    var newMove = new ChessMove(myPosition, newEndPosition, null);
-
-                    var possibleCollision = board.hasPieceAt(newEndPosition);
-                    if (possibleCollision) {
-                        var collisionPiece = board.getPiece(newEndPosition);
-                        if (collisionPiece.getTeamColor() != thisColor) {
-                            moves.add(newMove);
-                        }
-
-                        break;
-                    }
-
-                    moves.add(newMove);
-                }
-
-                // top right
-                for (int i = row + 1, j = col + 1; i <= 8 && j <= 8; i++, j++) {
-                    var newEndPosition = new ChessPosition(i, j);
-                    var newMove = new ChessMove(myPosition, newEndPosition, null);
-
-                    var possibleCollision = board.hasPieceAt(newEndPosition);
-                    if (possibleCollision) {
-                        var collisionPiece = board.getPiece(newEndPosition);
-                        if (collisionPiece.getTeamColor() != thisColor) {
-                            moves.add(newMove);
-                        }
-
-                        break;
-                    }
-
-                    moves.add(newMove);
-                }
-
-                break;
-            }
-            case KNIGHT:
-            {
-                ;
-                ;
-                ;
-
-                break;
-            }
-            case ROOK:
-            {
-                ;
-                ;
-                ;
-                ;
-
-                break;
-            }
-            case PAWN:
-            {
-                ;
-                ;
-                ;
-                ;
-                ;
-
-                break;
-            }
-            default:
-            {
+        return switch(getPieceType()) {
+            case KING -> kingMoves(board, myPosition);
+            case QUEEN -> null;
+            case BISHOP -> bishopMoves(board, myPosition);
+            case KNIGHT -> null;
+            case ROOK -> null;
+            case PAWN -> null;
+            default -> {
                 throw new RuntimeException("[ChessPiece.pieceMoves] irregular piece tried to move!");
             }
-        }
-
-        return moves;
+        };
     }
 }
