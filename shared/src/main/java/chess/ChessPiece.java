@@ -271,8 +271,8 @@ public class ChessPiece {
 
         for (int[] direction : directions) {
             for (int distance = 1; distance <= 8; distance++) {
-                int newRow= row + direction[0] * distance;
-                int newCol= col + direction[1] * distance;
+                int newRow = row + direction[0] * distance;
+                int newCol = col + direction[1] * distance;
 
                 if (newRow >= 1 && newRow <= 8 && newCol >= 1 && newCol <= 8) {
                     var newEndPosition = new ChessPosition(newRow, newCol);
@@ -303,13 +303,118 @@ public class ChessPiece {
         return moves;
     }
 
-    /**
-     * Calculates all the positions a chess piece can move to
-     * Does not take into account moves that are illegal due to leaving the king in
-     * danger
-     *
-     * @return Collection of valid moves
-     */
+    private static void pawnAddPromotionMoves(HashSet<ChessMove> moves, ChessPosition myPosition, ChessPosition newEndPosition) {
+        moves.add(new ChessMove(myPosition, newEndPosition, ChessPiece.PieceType.QUEEN));
+        moves.add(new ChessMove(myPosition, newEndPosition, ChessPiece.PieceType.BISHOP));
+        moves.add(new ChessMove(myPosition, newEndPosition, ChessPiece.PieceType.ROOK));
+        moves.add(new ChessMove(myPosition, newEndPosition, ChessPiece.PieceType.KNIGHT));
+    }
+
+    private Collection<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition) {
+        var moves = new HashSet<ChessMove>();
+
+        var thisColor = getTeamColor();
+        var row = myPosition.getRow();
+        var col = myPosition.getColumn();
+
+        // pawn has the most multifaceted behavior
+        // four behaviors
+        // 1. forward movement
+        // 1.a. first move (two squares)
+        // 1.b. normal move (one square)
+        // 2. diagonal movement (capturing)
+        // 3. promotion
+        // 4. en passant (extra credit in phase 1 if I really want to...)
+
+        // white: increments in row/col
+        // black: decrements in row/col
+        int direction = thisColor == ChessGame.TeamColor.WHITE ? 1 : -1;
+
+        // note: promotion is mandatory, must check in order steps
+        boolean isPromotionRow = (thisColor == ChessGame.TeamColor.WHITE && row == 7)
+                || (thisColor == ChessGame.TeamColor.BLACK && row == 2);
+
+        // forward movement (not conditional on first move -- can choose either)
+        int newRow = row + direction;
+        var newEndPosition = new ChessPosition(newRow, col);
+
+        if (!isPromotionRow && newRow >= 1 && newRow <= 8 && !board.hasPieceAt(newEndPosition)) {
+            var newMove = new ChessMove(myPosition, newEndPosition, null);
+
+            moves.add(newMove);
+        }
+
+        // first move
+        if ((thisColor == ChessGame.TeamColor.WHITE && row == 2) || (thisColor == ChessGame.TeamColor.BLACK && row == 7)) {
+            newRow = row + 2 * direction;
+            newEndPosition = new ChessPosition(newRow, col);
+
+            // we need to make sure the middle square isn't occupied
+            // because a pawn cannot jump over pieces
+            var midRow = row + 1 * direction;
+            var midPosition = new ChessPosition(midRow, col);
+
+            if (newRow >= 1 && newRow <= 8 && col >= 1 && col <= 8 && !board.hasPieceAt(newEndPosition) && !board.hasPieceAt((midPosition))) {
+                var newMove = new ChessMove(myPosition, newEndPosition, null);
+
+                moves.add(newMove);
+            }
+        }
+
+        // diagonal movement (capturing)
+        newRow = row + direction;
+
+        // first diagonal check
+        int newCol = col + 1;
+
+        newEndPosition = new ChessPosition(newRow, newCol);
+        if (newRow >= 1 && newRow <= 8 && newCol >= 1 && newCol <= 8 && board.hasPieceAt(newEndPosition)) {
+            var capturePiece = board.getPiece(newEndPosition);
+
+            if (capturePiece.getTeamColor() != thisColor) {
+                if (isPromotionRow) {
+                    pawnAddPromotionMoves(moves, myPosition, newEndPosition);
+                } else {
+                    var newMove = new ChessMove(myPosition, newEndPosition, null);
+
+                    moves.add(newMove);
+                }
+            }
+        }
+
+        newCol = col - 1;
+
+        newEndPosition = new ChessPosition(newRow, newCol);
+        if (newRow >= 1 && newRow <= 8 && newCol >= 1 && newCol <= 8 && board.hasPieceAt(newEndPosition)) {
+            var capturePiece = board.getPiece(newEndPosition);
+
+            if (capturePiece.getTeamColor() != thisColor) {
+                if (isPromotionRow) {
+                    pawnAddPromotionMoves(moves, myPosition, newEndPosition);
+                } else {
+                    var newMove = new ChessMove(myPosition, newEndPosition, null);
+
+                    moves.add(newMove);
+                }
+            }
+        }
+
+        // promotion
+        newEndPosition = new ChessPosition(newRow, col);
+        if (isPromotionRow && newRow >= 1 && newRow <= 8 && !board.hasPieceAt(newEndPosition)) {
+            pawnAddPromotionMoves(moves, myPosition, newEndPosition);
+        }
+
+        return moves;
+    }
+
+        /**
+         * Calculates all the positions a chess piece can move to
+         * Does not take into account moves that are illegal due to leaving the king in
+         * danger
+         *
+         * @return Collection of valid moves
+         */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         return switch(getPieceType()) {
             case KING -> kingMoves(board, myPosition);
@@ -317,7 +422,7 @@ public class ChessPiece {
             case BISHOP -> bishopMoves(board, myPosition);
             case KNIGHT -> knightMoves(board, myPosition);
             case ROOK -> rookMoves(board, myPosition);
-            case PAWN -> null;
+            case PAWN -> pawnMoves(board, myPosition);
             default -> {
                 throw new RuntimeException("[ChessPiece.pieceMoves] irregular piece tried to move!");
             }
