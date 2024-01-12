@@ -94,6 +94,49 @@ public class ChessPiece {
         return moves;
     }
 
+    private Collection<ChessMove> queenMoves(ChessBoard board, ChessPosition myPosition) {
+        var moves = new HashSet<ChessMove>();
+
+        var thisColor = getTeamColor();
+        var row = myPosition.getRow();
+        var col = myPosition.getColumn();
+
+        int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
+
+        for (int[] direction : directions) {
+            for (int distance = 1; distance <= 8; distance++) {
+                int newRow= row + direction[0] * distance;
+                int newCol= col + direction[1] * distance;
+
+                if (newRow >= 1 && newRow <= 8 && newCol >= 1 && newCol <= 8) {
+                    var newEndPosition = new ChessPosition(newRow, newCol);
+                    var newMove = new ChessMove(myPosition, newEndPosition, null);
+
+                    var possibleCollision = board.hasPieceAt(newEndPosition);
+                    if (possibleCollision) {
+                        var collisionPiece = board.getPiece(newEndPosition);
+
+                        // if we collide with another piece, if it's an enemy it's a possible move
+                        // however if it's one of our own pieces, we cannot capture our own pieces
+                        if (collisionPiece.getTeamColor() != thisColor) {
+                            moves.add(newMove);
+                        }
+
+                        break;
+                    } else {
+                        moves.add(newMove);
+                    }
+                } else {
+                    // because we are looping max distance [1-8], no need to waste iterations
+
+                    break;
+                }
+            }
+        }
+
+        return moves;
+    }
+
     private HashSet<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition) {
         var moves = new HashSet<ChessMove>();
 
@@ -217,6 +260,49 @@ public class ChessPiece {
         return moves;
     }
 
+    private Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition) {
+        var moves = new HashSet<ChessMove>();
+
+        var thisColor = getTeamColor();
+        var row = myPosition.getRow();
+        var col = myPosition.getColumn();
+
+        int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+
+        for (int[] direction : directions) {
+            for (int distance = 1; distance <= 8; distance++) {
+                int newRow= row + direction[0] * distance;
+                int newCol= col + direction[1] * distance;
+
+                if (newRow >= 1 && newRow <= 8 && newCol >= 1 && newCol <= 8) {
+                    var newEndPosition = new ChessPosition(newRow, newCol);
+                    var newMove = new ChessMove(myPosition, newEndPosition, null);
+
+                    var possibleCollision = board.hasPieceAt(newEndPosition);
+                    if (possibleCollision) {
+                        var collisionPiece = board.getPiece(newEndPosition);
+
+                        // if we collide with another piece, if it's an enemy it's a possible move
+                        // however if it's one of our own pieces, we cannot capture our own pieces
+                        if (collisionPiece.getTeamColor() != thisColor) {
+                            moves.add(newMove);
+                        }
+
+                        break;
+                    } else {
+                        moves.add(newMove);
+                    }
+                } else {
+                    // because we are looping max distance [1-8], no need to waste iterations
+
+                    break;
+                }
+            }
+        }
+
+        return moves;
+    }
+
     /**
      * Calculates all the positions a chess piece can move to
      * Does not take into account moves that are illegal due to leaving the king in
@@ -227,10 +313,10 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         return switch(getPieceType()) {
             case KING -> kingMoves(board, myPosition);
-            case QUEEN -> null;
+            case QUEEN -> queenMoves(board, myPosition);
             case BISHOP -> bishopMoves(board, myPosition);
             case KNIGHT -> knightMoves(board, myPosition);
-            case ROOK -> null;
+            case ROOK -> rookMoves(board, myPosition);
             case PAWN -> null;
             default -> {
                 throw new RuntimeException("[ChessPiece.pieceMoves] irregular piece tried to move!");
