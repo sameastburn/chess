@@ -182,6 +182,41 @@ public class ChessPiece {
         return moves;
     }
 
+    private Collection<ChessMove> knightMoves(ChessBoard board, ChessPosition myPosition) {
+        var moves = new HashSet<ChessMove>();
+
+        var thisColor = getTeamColor();
+        var row = myPosition.getRow();
+        var col = myPosition.getColumn();
+
+        int[][] directions = {{2, 1}, {2, -1}, {-2, 1}, {-2, -1}, {1, 2}, {1, -2}, {-1, 2}, {-1, -2}};
+
+        for (int[] direction : directions) {
+            int newRow = row + direction[0];
+            int newCol = col + direction[1];
+
+            if (newRow >= 1 && newRow <= 8 && newCol >= 1 && newCol <= 8) {
+                var newEndPosition = new ChessPosition(newRow, newCol);
+                var newMove = new ChessMove(myPosition, newEndPosition, null);
+
+                var possibleCollision = board.hasPieceAt(newEndPosition);
+                if (possibleCollision) {
+                    var collisionPiece = board.getPiece(newEndPosition);
+
+                    // if we collide with another piece, if it's an enemy it's a possible move
+                    // however if it's one of our own pieces, we cannot capture our own pieces
+                    if (collisionPiece.getTeamColor() != thisColor) {
+                        moves.add(newMove);
+                    }
+                } else {
+                    moves.add(newMove);
+                }
+            }
+        }
+
+        return moves;
+    }
+
     /**
      * Calculates all the positions a chess piece can move to
      * Does not take into account moves that are illegal due to leaving the king in
@@ -194,7 +229,7 @@ public class ChessPiece {
             case KING -> kingMoves(board, myPosition);
             case QUEEN -> null;
             case BISHOP -> bishopMoves(board, myPosition);
-            case KNIGHT -> null;
+            case KNIGHT -> knightMoves(board, myPosition);
             case ROOK -> null;
             case PAWN -> null;
             default -> {
