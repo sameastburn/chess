@@ -2,51 +2,6 @@ package chess;
 
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Arrays;
-import java.util.Objects;
-
-class ArrayEqualityDebugger {
-
-    // Method to compare two arrays
-    public static <T> boolean compareArrays(T[] array1, T[] array2) {
-        if (Arrays.equals(array1, array2)) {
-            System.out.println("\narrays equal!");
-
-            return true;
-        } else {
-            System.out.println("\narrays not equal: " + getDifferences(array1, array2));
-
-            return false;
-        }
-    }
-
-    // Method to find differences between two arrays
-    private static <T> String getDifferences(T[] array1, T[] array2) {
-        StringBuilder differences = new StringBuilder();
-        int minLength = Math.min(array1.length, array2.length);
-
-        // Check elements in the common length
-        for (int i = 0; i < minLength; i++) {
-            if (!Objects.deepEquals(array1[i], array2[i])) {
-                differences.append(String.format("Difference at index %d: '%s' vs '%s'%n", i, array1[i], array2[i]));
-            }
-        }
-
-        // Check if any array is longer than the other
-        if (array1.length > minLength) {
-            differences.append("Array1 has extra elements: ")
-                    .append(Arrays.toString(Arrays.copyOfRange(array1, minLength, array1.length)))
-                    .append("\n");
-        }
-        if (array2.length > minLength) {
-            differences.append("Array2 has extra elements: ")
-                    .append(Arrays.toString(Arrays.copyOfRange(array2, minLength, array2.length)))
-                    .append("\n");
-        }
-
-        return differences.toString();
-    }
-}
 
 /**
  * A chessboard that can hold and rearrange chess pieces.
@@ -55,8 +10,7 @@ class ArrayEqualityDebugger {
  * signature of the existing methods.
  */
 public class ChessBoard {
-    // *** DEBUG *** CHANGE BACK TO PRIVATE
-    public ChessPiece[][] board;
+    private ChessPiece[][] board;
 
     public ChessBoard() {
         // we will express positions as [1-8]...
@@ -129,22 +83,20 @@ public class ChessBoard {
 
     @Override
     public boolean equals(Object o) {
-        System.out.println("[ChessBoard.equals]");
-
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChessBoard that=(ChessBoard) o;
 
-        System.out.println("\n[ChessBoard.equals] ArrayEqualityDebugger.compareArrays");
-        //boolean result = ArrayEqualityDebugger.compareArrays(board, that.board);
-
-        //return result;//Arrays.equals(board, that.board);
         return Arrays.deepEquals(board, that.board);
     }
 
     @Override
     public int hashCode() {
         return Arrays.deepHashCode(board);
+    }
+
+    public ChessPiece[][] getBoard() {
+        return this.board;
     }
 
     /**
@@ -163,15 +115,6 @@ public class ChessBoard {
                 |R|N|B|Q|K|B|N|R|
                 """);
 
-        System.out.println("resetBoard");
-        System.out.println(Arrays.toString(expectedBoard.board));
-
-        // idk... maybe rewrite this, it's late
-        this.board = expectedBoard.board;
-
-        System.out.println("this.board");
-        System.out.println(Arrays.toString(this.board));
-
-        ;
+        this.board = expectedBoard.getBoard();
     }
 }
