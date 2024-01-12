@@ -46,6 +46,13 @@ public class ChessBoard {
         return this.board[row][column];
     }
 
+    public boolean hasPieceAt(ChessPosition position) {
+        var row = position.getRow();
+        var column = position.getColumn();
+
+        return this.board[row][column] != null;
+    }
+
     final static Map<Character, ChessPiece.PieceType> charToTypeMap = Map.of(
             'p', ChessPiece.PieceType.PAWN,
             'n', ChessPiece.PieceType.KNIGHT,

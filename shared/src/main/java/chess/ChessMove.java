@@ -17,18 +17,9 @@ public class ChessMove {
         if (o == null || getClass() != o.getClass()) return false;
         ChessMove chessMove=(ChessMove) o;
 
-        // System.out.println("\nam i even being run? equals ChessMove");
-
         boolean startEquals = start.equals(chessMove.start);
         boolean endEquals = end.equals(chessMove.end);
         boolean promotionEquals = promotion == chessMove.promotion;
-
-        /*
-        System.out.println("this start: " + start.toString());
-        System.out.println("chessMove start: " + chessMove.start.toString());
-
-        System.out.println("start, end, promotion: " + startEquals + endEquals + promotionEquals);
-         */
 
         return startEquals && endEquals && promotionEquals;
     }

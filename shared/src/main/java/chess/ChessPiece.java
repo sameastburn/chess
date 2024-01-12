@@ -69,6 +69,7 @@ public class ChessPiece {
         var moves = new HashSet<ChessMove>();
 
         var thisType = getPieceType();
+        var thisColor = getTeamColor();
         var row = myPosition.getRow();
         var col = myPosition.getColumn();
 
@@ -87,35 +88,76 @@ public class ChessPiece {
             {
                 // a bishop moves diagonally, so that's a possible four directions
                 // let's calculate each direction individually
+                // fun fact: the directions were wrong but the math was right
 
-                // top left
+                // bottom left
                 for (int i = row - 1, j = col - 1; i >= 1 && j >= 1; i--, j--) {
                     var newEndPosition = new ChessPosition(i, j);
                     var newMove = new ChessMove(myPosition, newEndPosition, null);
 
-                    moves.add(newMove);
-                }
+                    var possibleCollision = board.hasPieceAt(newEndPosition);
+                    if (possibleCollision) {
+                        var collisionPiece = board.getPiece(newEndPosition);
+                        if (collisionPiece.getTeamColor() != thisColor) {
+                            moves.add(newMove);
+                        }
 
-                // top right
-                for (int i = row - 1, j = col + 1; i >= 1 && j <= 8; i--, j++) {
-                    var newEndPosition = new ChessPosition(i, j);
-                    var newMove = new ChessMove(myPosition, newEndPosition, null);
-
-                    moves.add(newMove);
-                }
-
-                // bottom left
-                for (int i = row + 1, j = col - 1; i <= 8 && j >= 1; i++, j--) {
-                    var newEndPosition = new ChessPosition(i, j);
-                    var newMove = new ChessMove(myPosition, newEndPosition, null);
+                        break;
+                    }
 
                     moves.add(newMove);
                 }
 
                 // bottom right
+                for (int i = row - 1, j = col + 1; i >= 1 && j <= 8; i--, j++) {
+                    var newEndPosition = new ChessPosition(i, j);
+                    var newMove = new ChessMove(myPosition, newEndPosition, null);
+
+                    var possibleCollision = board.hasPieceAt(newEndPosition);
+                    if (possibleCollision) {
+                        var collisionPiece = board.getPiece(newEndPosition);
+                        if (collisionPiece.getTeamColor() != thisColor) {
+                            moves.add(newMove);
+                        }
+
+                        break;
+                    }
+
+                    moves.add(newMove);
+                }
+
+                // top left
+                for (int i = row + 1, j = col - 1; i <= 8 && j >= 1; i++, j--) {
+                    var newEndPosition = new ChessPosition(i, j);
+                    var newMove = new ChessMove(myPosition, newEndPosition, null);
+
+                    var possibleCollision = board.hasPieceAt(newEndPosition);
+                    if (possibleCollision) {
+                        var collisionPiece = board.getPiece(newEndPosition);
+                        if (collisionPiece.getTeamColor() != thisColor) {
+                            moves.add(newMove);
+                        }
+
+                        break;
+                    }
+
+                    moves.add(newMove);
+                }
+
+                // top right
                 for (int i = row + 1, j = col + 1; i <= 8 && j <= 8; i++, j++) {
                     var newEndPosition = new ChessPosition(i, j);
                     var newMove = new ChessMove(myPosition, newEndPosition, null);
+
+                    var possibleCollision = board.hasPieceAt(newEndPosition);
+                    if (possibleCollision) {
+                        var collisionPiece = board.getPiece(newEndPosition);
+                        if (collisionPiece.getTeamColor() != thisColor) {
+                            moves.add(newMove);
+                        }
+
+                        break;
+                    }
 
                     moves.add(newMove);
                 }
