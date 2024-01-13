@@ -41,8 +41,20 @@ public class ChessBoard {
     return this.board[position.getRow()][position.getColumn()];
   }
 
+  public void removePieceAt(ChessPosition position) {
+    this.board[position.getRow()][position.getColumn()] = null;
+  }
+
   public boolean hasPieceAt(ChessPosition position) {
     return getPiece(position) != null;
+  }
+
+  public void movePiece(ChessPosition from, ChessPosition to) {
+    var piece = getPiece(from);
+
+    addPiece(to, piece);
+
+    removePieceAt(from);
   }
 
   @Override

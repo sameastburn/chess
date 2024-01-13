@@ -124,3 +124,6 @@ modules.xml
 client/target/
 server/target/
 shared/target/
+
+# don't need mac folder attributes
+.DS_Store
