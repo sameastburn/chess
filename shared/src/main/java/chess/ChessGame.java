@@ -95,21 +95,21 @@ public class ChessGame {
    */
   public void makeMove(ChessMove move) throws InvalidMoveException {
     if (!isMoveWithinTurn(move)) {
-      throw new InvalidMoveException("*** DEBUG *** InvalidMoveException (!isMoveWithinTurn(move))");
+      throw new InvalidMoveException("InvalidMoveException: attempted to move out of turn");
     }
 
     var startPosition = move.getStartPosition();
     var validMoves = validMoves(startPosition);
 
     if (!validMoves.contains(move)) {
-      throw new InvalidMoveException("*** DEBUG *** InvalidMoveException (!validMoves.contains(move))");
+      throw new InvalidMoveException("InvalidMoveException: attempted to make an invalid move");
     }
 
     var tempBoard = new ChessBoard(board.getBoard());
     tempBoard.movePiece(move.getStartPosition(), move.getEndPosition(), move.getPromotionPiece());
 
     if (isInCheck(getTeamTurn(), tempBoard)) {
-      throw new InvalidMoveException("*** DEBUG *** InvalidMoveException didn't get out of check");
+      throw new InvalidMoveException("InvalidMoveException: didn't get out of check");
     }
 
     board.movePiece(move.getStartPosition(), move.getEndPosition(), move.getPromotionPiece());

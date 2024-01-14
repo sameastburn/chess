@@ -772,10 +772,7 @@ public class ChessGameTests {
               {1, 5}, {1, 6}, {1, 7}, {2, 5}, {2, 7},
       });
 
-      // *** DEBUG *** remove me, test modification for debugging!
-      var gameValidMoves = game.validMoves(position);
-
-      Assertions.assertEquals(validMoves, gameValidMoves,
+      Assertions.assertEquals(validMoves, game.validMoves(position),
               "ChessGame validMoves did not return the correct moves");
     }
 
