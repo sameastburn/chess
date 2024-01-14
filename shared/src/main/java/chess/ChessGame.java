@@ -70,10 +70,11 @@ public class ChessGame {
       throw new InvalidMoveException("*** DEBUG *** InvalidMoveException (!validMoves.contains(move))");
     }
 
-    var piece = board.getPiece(startPosition);
-    if (isInCheck(getTeamTurn())) {
-      // *** DEBUG *** continue working from here
-      // check if move startPosition and move endPosition both result in check!
+    var tempBoard = new ChessBoard(board.getBoard());
+    tempBoard.movePiece(move.getStartPosition(), move.getEndPosition());
+
+    if (isInCheck(getTeamTurn(), tempBoard)) {
+      throw new InvalidMoveException("*** DEBUG *** InvalidMoveException didn't get out of check");
     }
 
     board.movePiece(move.getStartPosition(), move.getEndPosition());
@@ -88,17 +89,23 @@ public class ChessGame {
    * @return True if the specified team is in check
    */
 
-  public boolean isInCheck(TeamColor teamColor) {
-    ChessPosition friendlyKingPosition = new ChessPosition(0, 0);
+  public boolean isInCheck(TeamColor teamColor, ChessBoard board) {
+    var oldBoard = getBoard();
 
-    return isInCheck(teamColor, friendlyKingPosition);
+    // can't alter signature of the existing methods... hacky ftw
+    setBoard(board);
+    var ret = isInCheck(teamColor);
+    setBoard(oldBoard);
+
+    return ret;
   }
 
-  public boolean isInCheck(TeamColor teamColor, ChessPosition friendlyKingPosition) {
+  public boolean isInCheck(TeamColor teamColor) {
     boolean inCheck = false;
 
     var board = getBoard();
-    var boardArr = board.getBoard();
+
+    ChessPosition friendlyKingPosition = new ChessPosition(0, 0);
 
     ArrayList<ChessMove> allEnemyPossibleMoves = new ArrayList<>();
     for (int i = 1; i < 9; i++) {

@@ -20,6 +20,12 @@ public class ChessBoard {
     board = new ChessPiece[9][9];
   }
 
+  public ChessBoard(ChessPiece[][] board) {
+    this.board = new ChessPiece[9][9];
+
+    setBoard(board);
+  }
+
   /**
    * Adds a chess piece to the chessboard
    *
@@ -73,6 +79,16 @@ public class ChessBoard {
 
   public ChessPiece[][] getBoard() {
     return this.board;
+  }
+
+  /**
+   * Sets the board to the provided 2D board array
+   * Note that this performs a deep copy rather than reassigning the reference!
+   */
+  public void setBoard(ChessPiece[][] board) {
+    for (int i = 0; i < board.length; i++) {
+      System.arraycopy(board[i], 0, this.board[i], 0, board[i].length);
+    }
   }
 
   /**
