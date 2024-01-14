@@ -160,6 +160,7 @@ public class ChessGame {
     ChessPosition friendlyKingPosition = new ChessPosition(0, 0);
     ChessPiece friendlyKingPiece = new ChessPiece(teamColor, ChessPiece.PieceType.KING);
 
+    // *** DEBUG *** move me into a static function because this isn't very pretty
     // could probably be more efficient here but... yeah... this function will not be fast.
     for (int i = 1; i < 9; i++) {
       for (int j = 1; j < 9; j++) {
@@ -202,7 +203,42 @@ public class ChessGame {
    * @return True if the specified team is in stalemate, otherwise false
    */
   public boolean isInStalemate(TeamColor teamColor) {
-    throw new RuntimeException("Not implemented");
+    // stalemate happens if two conditions are true
+    // 1. king is not in check
+    // 2. no legal moves possible
+
+    if (isInCheck(teamColor)) {
+      return false;
+    }
+
+    for (int i = 1; i < 9; i++) {
+      for (int j = 1; j < 9; j++) {
+        var checkPosition = new ChessPosition(i, j);
+        var possiblePiece = board.getPiece(checkPosition);
+
+        // our one caveat with pieceMoves is that
+        // it doesn't "take into account moves that are illegal due to leaving the king in danger"
+        // so we need to replicate that behavior here... and maybe somewhere else
+        // but here for now...
+
+        if (possiblePiece != null) {
+          if (possiblePiece.getTeamColor() == teamColor) {
+            Collection<ChessMove> possibleMoves = possiblePiece.pieceMoves(board, checkPosition);
+
+            for (ChessMove move : possibleMoves) {
+              ChessBoard tempBoard = new ChessBoard(board.getBoard());
+              tempBoard.movePiece(move.getStartPosition(), move.getEndPosition(), move.getPromotionPiece());
+
+              if (!isInCheck(teamColor, tempBoard)) {
+                return false;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return true;
   }
 
   /**
