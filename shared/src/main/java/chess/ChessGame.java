@@ -71,13 +71,13 @@ public class ChessGame {
     }
 
     var tempBoard = new ChessBoard(board.getBoard());
-    tempBoard.movePiece(move.getStartPosition(), move.getEndPosition());
+    tempBoard.movePiece(move.getStartPosition(), move.getEndPosition(), move.getPromotionPiece());
 
     if (isInCheck(getTeamTurn(), tempBoard)) {
       throw new InvalidMoveException("*** DEBUG *** InvalidMoveException didn't get out of check");
     }
 
-    board.movePiece(move.getStartPosition(), move.getEndPosition());
+    board.movePiece(move.getStartPosition(), move.getEndPosition(), move.getPromotionPiece());
 
     setTeamTurn(getTeamTurn() == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE);
   }

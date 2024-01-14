@@ -55,8 +55,12 @@ public class ChessBoard {
     return getPiece(position) != null;
   }
 
-  public void movePiece(ChessPosition from, ChessPosition to) {
+  public void movePiece(ChessPosition from, ChessPosition to, ChessPiece.PieceType promotion) {
     var piece = getPiece(from);
+
+    if (promotion != null) {
+      piece.setPieceType(promotion);
+    }
 
     addPiece(to, piece);
 
