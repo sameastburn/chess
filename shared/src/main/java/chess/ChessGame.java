@@ -153,7 +153,45 @@ public class ChessGame {
    * @return True if the specified team is in checkmate
    */
   public boolean isInCheckmate(TeamColor teamColor) {
-    throw new RuntimeException("Not implemented");
+    if (!isInCheck(teamColor)) {
+      return false;
+    }
+
+    ChessPosition friendlyKingPosition = new ChessPosition(0, 0);
+    ChessPiece friendlyKingPiece = new ChessPiece(teamColor, ChessPiece.PieceType.KING);
+
+    // could probably be more efficient here but... yeah... this function will not be fast.
+    for (int i = 1; i < 9; i++) {
+      for (int j = 1; j < 9; j++) {
+        var checkPosition = new ChessPosition(i, j);
+        var possiblePiece = board.getPiece(checkPosition);
+
+        if (possiblePiece != null) {
+          if (possiblePiece.getTeamColor() == teamColor && possiblePiece.getPieceType() == ChessPiece.PieceType.KING) {
+            friendlyKingPosition = checkPosition;
+            friendlyKingPiece = possiblePiece;
+          }
+        }
+      }
+    }
+
+    Collection<ChessMove> possibleKingMoves = friendlyKingPiece.pieceMoves(getBoard(), friendlyKingPosition);
+    var tempBoard = new ChessBoard(board.getBoard());
+
+    boolean escapedCheck = false;
+    for (ChessMove move : possibleKingMoves) {
+      tempBoard.movePiece(move.getStartPosition(), move.getEndPosition(), move.getPromotionPiece());
+
+      if (!isInCheck(teamColor, tempBoard)) {
+        escapedCheck = true;
+
+        break;
+      }
+
+      tempBoard.setBoard(board.getBoard());
+    }
+
+    return !escapedCheck;
   }
 
   /**
