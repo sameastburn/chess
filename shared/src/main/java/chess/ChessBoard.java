@@ -21,7 +21,7 @@ public class ChessBoard {
   }
 
   public ChessBoard(ChessPiece[][] board) {
-    this.board = new ChessPiece[9][9];
+    this();
 
     setBoard(board);
   }
