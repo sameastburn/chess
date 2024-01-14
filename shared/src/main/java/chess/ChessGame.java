@@ -18,6 +18,27 @@ public class ChessGame {
 
   }
 
+  public static KingReturn findFriendlyKing(ChessBoard board, TeamColor teamColor) {
+    ChessPosition friendlyKingPosition = new ChessPosition(0, 0);
+    ChessPiece friendlyKingPiece = new ChessPiece(teamColor, ChessPiece.PieceType.KING);
+
+    for (int i = 1; i < 9; i++) {
+      for (int j = 1; j < 9; j++) {
+        var checkPosition = new ChessPosition(i, j);
+        var possiblePiece = board.getPiece(checkPosition);
+
+        if (possiblePiece != null) {
+          if (possiblePiece.getTeamColor() == teamColor && possiblePiece.getPieceType() == ChessPiece.PieceType.KING) {
+            friendlyKingPosition = checkPosition;
+            friendlyKingPiece = possiblePiece;
+          }
+        }
+      }
+    }
+
+    return new ChessGame.KingReturn(friendlyKingPosition, friendlyKingPiece);
+  }
+
   /**
    * @return Which team's turn it is
    */
@@ -138,21 +159,15 @@ public class ChessGame {
           }
 
           allEnemyPossibleMoves.addAll(possiblePiece.pieceMoves(board, checkPosition));
-
-          // System.out.println("*** DEBUG *** possiblePiece: " + possiblePiece.getTeamColor());
         }
       }
     }
 
     // check if any of the possible enemy moves include the king
     for (ChessMove move : allEnemyPossibleMoves) {
-      // System.out.println("*** DEBUG *** move.row: " + move.getEndPosition().getRow());
-      // System.out.println("*** DEBUG *** move.col: " + move.getEndPosition().getColumn() + "\n");
-
       if (move.getEndPosition().equals(friendlyKingPosition)) {
-        // System.out.println("*** DEBUG *** uh oh check detected!");
-
         inCheck = true;
+
         break;
       }
     }
@@ -171,26 +186,9 @@ public class ChessGame {
       return false;
     }
 
-    ChessPosition friendlyKingPosition = new ChessPosition(0, 0);
-    ChessPiece friendlyKingPiece = new ChessPiece(teamColor, ChessPiece.PieceType.KING);
+    KingReturn kingInfo = findFriendlyKing(board, teamColor);
 
-    // *** DEBUG *** move me into a static function because this isn't very pretty
-    // could probably be more efficient here but... yeah... this function will not be fast.
-    for (int i = 1; i < 9; i++) {
-      for (int j = 1; j < 9; j++) {
-        var checkPosition = new ChessPosition(i, j);
-        var possiblePiece = board.getPiece(checkPosition);
-
-        if (possiblePiece != null) {
-          if (possiblePiece.getTeamColor() == teamColor && possiblePiece.getPieceType() == ChessPiece.PieceType.KING) {
-            friendlyKingPosition = checkPosition;
-            friendlyKingPiece = possiblePiece;
-          }
-        }
-      }
-    }
-
-    Collection<ChessMove> possibleKingMoves = friendlyKingPiece.pieceMoves(getBoard(), friendlyKingPosition);
+    Collection<ChessMove> possibleKingMoves = kingInfo.piece().pieceMoves(getBoard(), kingInfo.position());
     var tempBoard = new ChessBoard(board.getBoard());
 
     boolean escapedCheck = false;
@@ -230,11 +228,7 @@ public class ChessGame {
         var checkPosition = new ChessPosition(i, j);
         var possiblePiece = board.getPiece(checkPosition);
 
-        // our one caveat with pieceMoves is that
-        // it doesn't "take into account moves that are illegal due to leaving the king in danger"
-        // so we need to replicate that behavior here... and maybe somewhere else
-        // but here for now...
-
+        // take into account moves that are illegal due to leaving the king in danger
         if (possiblePiece != null) {
           if (possiblePiece.getTeamColor() == teamColor) {
             Collection<ChessMove> possibleMoves = possiblePiece.pieceMoves(board, checkPosition);
@@ -278,5 +272,8 @@ public class ChessGame {
    */
   public enum TeamColor {
     WHITE, BLACK
+  }
+
+  public record KingReturn(ChessPosition position, ChessPiece piece) {
   }
 }
