@@ -2,6 +2,7 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -42,8 +43,21 @@ public class ChessGame {
    */
   public Collection<ChessMove> validMoves(ChessPosition startPosition) {
     var piece = board.getPiece(startPosition);
+    var teamColor = piece.getTeamColor();
+    var potentialMoves = piece.pieceMoves(this.board, startPosition);
+    var validMoves = new HashSet<ChessMove>();
 
-    return piece.pieceMoves(this.board, startPosition);
+    // filter moves that leave the king in danger
+    for (ChessMove move : potentialMoves) {
+      ChessBoard tempBoard = new ChessBoard(board.getBoard());
+      tempBoard.movePiece(move.getStartPosition(), move.getEndPosition(), move.getPromotionPiece());
+
+      if (!isInCheck(teamColor, tempBoard)) {
+        validMoves.add(move);
+      }
+    }
+
+    return validMoves;
   }
 
   private boolean isMoveWithinTurn(ChessMove move) {
