@@ -67,7 +67,7 @@ public class ChessPiece {
       int newCol = col + direction[1];
 
       if (newRow < 1 || newRow > 8 || newCol < 1 || newCol > 8) {
-        break;
+        continue;
       }
 
       var newEndPosition = new ChessPosition(newRow, newCol);

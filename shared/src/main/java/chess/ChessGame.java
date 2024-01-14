@@ -118,18 +118,18 @@ public class ChessGame {
 
           allEnemyPossibleMoves.addAll(possiblePiece.pieceMoves(board, checkPosition));
 
-          // System.out.println("possiblePiece: " + possiblePiece.getTeamColor());
+          // System.out.println("*** DEBUG *** possiblePiece: " + possiblePiece.getTeamColor());
         }
       }
     }
 
     // check if any of the possible enemy moves include the king
     for (ChessMove move : allEnemyPossibleMoves) {
-      // System.out.println("move.row: " + move.getEndPosition().getRow());
-      // System.out.println("move.col: " + move.getEndPosition().getColumn() + "\n");
+      // System.out.println("*** DEBUG *** move.row: " + move.getEndPosition().getRow());
+      // System.out.println("*** DEBUG *** move.col: " + move.getEndPosition().getColumn() + "\n");
 
       if (move.getEndPosition().equals(friendlyKingPosition)) {
-        // System.out.println("uh oh check detected!");
+        // System.out.println("*** DEBUG *** uh oh check detected!");
 
         inCheck = true;
         break;
