@@ -12,7 +12,7 @@ public class Server {
         var webDir = Paths.get(Server.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "web");
         Spark.externalStaticFileLocation(webDir.toString());
 
-        // Register your endpoints and handle exceptions here.
+        Spark.delete("/db", (req, res) -> (new RouteHandler()).db(req, res));
 
         Spark.awaitInitialization();
         return Spark.port();
