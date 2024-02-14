@@ -12,11 +12,11 @@ public class UserService {
     return instance;
   }
 
-  public AuthData register(UserData user) {
+  public LoginResult register(UserData user) {
     return authDAO.register(user);
   }
-  public AuthData login(UserData user) {
-    return new AuthData("", "");
+  public LoginResult login(LoginRequest loginRequest) {
+    return authDAO.login(loginRequest);
   }
   public void logout(UserData user) {}
 }

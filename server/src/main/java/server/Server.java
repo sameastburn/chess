@@ -15,6 +15,7 @@ public class Server {
 
     Spark.delete("/db", routeHandler::db, gson::toJson);
     Spark.post("/user", routeHandler::user, gson::toJson);
+    Spark.post("/session", routeHandler::session, gson::toJson);
   }
 
   public int run(int desiredPort) {

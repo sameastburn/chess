@@ -1,7 +1,7 @@
 package server;
 
 import chess.ChessGame;
-import model.UserData;
+import model.*;
 import service.UserService;
 import spark.Request;
 import spark.Response;
@@ -32,5 +32,11 @@ public class RouteHandler {
     UserData userFromResponse = gson.fromJson(request.body(), UserData.class);
 
     return userService.register(userFromResponse);
+  }
+
+  public Object session(Request request, Response response) {
+    LoginRequest loginRequest = gson.fromJson(request.body(), LoginRequest.class);
+
+    return userService.login(loginRequest);
   }
 }

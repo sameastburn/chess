@@ -1,7 +1,6 @@
 package dataAccess;
 
-import model.AuthData;
-import model.UserData;
+import model.*;
 
 import java.util.*;
 
@@ -10,14 +9,17 @@ public class MemoryAuthDAO implements AuthDAO {
   private HashSet<String> authTokens = new HashSet<String>();
 
   @Override
-  public AuthData register(UserData newUser) {
+  public LoginResult register(UserData newUser) {
     users.add(newUser);
 
-    // TODO: for now we just need to know if the token exists...
-    // TODO: probably upgrade to a map or something
+    return new LoginResult(newUser.username(), "");
+  }
+
+  @Override
+  public LoginResult login(LoginRequest user) {
     String newToken = UUID.randomUUID().toString();
     authTokens.add(newToken);
 
-    return new AuthData(newToken, newUser.username());
+    return new LoginResult(user.username(), newToken);
   }
 }

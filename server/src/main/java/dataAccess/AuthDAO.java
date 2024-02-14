@@ -1,8 +1,8 @@
 package dataAccess;
 
-import model.AuthData;
-import model.UserData;
+import model.*;
 
 public interface AuthDAO {
-  public AuthData register(UserData newUser);
+  public LoginResult register(UserData newUser);
+  public LoginResult login(LoginRequest user);
 }
