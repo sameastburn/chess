@@ -25,15 +25,15 @@ public class MemoryAuthDAO implements AuthDAO {
 
   @Override
   public LoginResult login(LoginRequest user) throws LoginException {
-    var userFromDatabase = getUser(user.username());
+    UserData userNotNull = getUser(user.username()).orElseThrow(() -> new LoginUnauthorizedException("User not found within database"));
 
-    if (userFromDatabase.isPresent()) {
-      String newToken = UUID.randomUUID().toString();
-      authTokens.add(newToken);
-
-      return new LoginResult(user.username(), newToken);
-    } else {
-      throw new LoginUnauthorizedException("User not found within database");
+    if (!userNotNull.password().equals(user.password())) {
+      throw new LoginUnauthorizedException("User attempted to login with incorrect password");
     }
+
+    String newToken = UUID.randomUUID().toString();
+    authTokens.add(newToken);
+
+    return new LoginResult(userNotNull.username(), newToken);
   }
 }

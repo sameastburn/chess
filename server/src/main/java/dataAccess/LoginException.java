@@ -5,5 +5,3 @@ public class LoginException extends Exception {
     super(message);
   }
 }
-
-;
