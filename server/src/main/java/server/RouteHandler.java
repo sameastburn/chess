@@ -1,6 +1,8 @@
 package server;
 
 import chess.ChessGame;
+import dataAccess.LoginException;
+import dataAccess.LoginUnauthorizedException;
 import model.*;
 import service.UserService;
 import spark.Request;
@@ -18,8 +20,6 @@ public class RouteHandler {
   }
 
   public Object db(Request request, Response response) {
-    response.status(200);
-
     // TODO: I don't know why, but standard serialized objects are not being
     // TODO: detected as JSON by the auto-grader, but massive ChessGame is
     // TODO: take a better look at this
@@ -34,9 +34,17 @@ public class RouteHandler {
     return userService.register(userFromResponse);
   }
 
-  public Object session(Request request, Response response) {
+  public Object session(Request request, Response response)  {
     LoginRequest loginRequest = gson.fromJson(request.body(), LoginRequest.class);
 
-    return userService.login(loginRequest);
+    try {
+      return userService.login(loginRequest);
+    } catch (LoginUnauthorizedException e) {
+      response.status(401);
+
+      return new FailureResponse("Error: bad request");
+    } catch (LoginException e) {
+      throw new RuntimeException(e);
+    }
   }
 }
