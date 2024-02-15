@@ -36,4 +36,10 @@ public class MemoryAuthDAO implements AuthDAO {
 
     return new LoginResult(userNotNull.username(), newToken);
   }
+
+  public void authorize(String authToken) throws LoginUnauthorizedException {
+    if (!authTokens.contains(authToken)) {
+      throw new LoginUnauthorizedException("User attempted to authorize with incorrect authToken");
+    }
+  }
 }

@@ -4,6 +4,7 @@ import chess.ChessGame;
 import dataAccess.LoginException;
 import dataAccess.LoginUnauthorizedException;
 import model.*;
+import service.GameService;
 import service.UserService;
 import spark.Request;
 import spark.Response;
@@ -14,6 +15,7 @@ public class RouteHandler {
   private static final RouteHandler instance = new RouteHandler();
   private static final Gson gson = new Gson();
   private static final UserService userService = UserService.getInstance();
+  private static final GameService gameService = GameService.getInstance();
 
   public static RouteHandler getInstance() {
     return instance;
@@ -39,6 +41,22 @@ public class RouteHandler {
 
     try {
       return userService.login(loginRequest);
+    } catch (LoginUnauthorizedException e) {
+      response.status(401);
+
+      return new FailureResponse("Error: bad request");
+    } catch (LoginException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public Object game(Request request, Response response)  {
+    String authToken = request.headers("Authorization");
+
+    try {
+      userService.authorize(authToken);
+
+      return gameService.listGames();
     } catch (LoginUnauthorizedException e) {
       response.status(401);
 

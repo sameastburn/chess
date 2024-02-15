@@ -2,6 +2,7 @@ package service;
 
 import dataAccess.AuthDAO;
 import dataAccess.LoginException;
+import dataAccess.LoginUnauthorizedException;
 import dataAccess.MemoryAuthDAO;
 import model.*;
 
@@ -18,6 +19,9 @@ public class UserService {
   }
   public LoginResult login(LoginRequest loginRequest) throws LoginException {
     return authDAO.login(loginRequest);
+  }
+  public void authorize(String authToken) throws LoginUnauthorizedException {
+    authDAO.authorize(authToken);
   }
   public void logout(UserData user) {}
 }
