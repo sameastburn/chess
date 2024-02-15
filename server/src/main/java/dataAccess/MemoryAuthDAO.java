@@ -20,7 +20,10 @@ public class MemoryAuthDAO implements AuthDAO {
   public LoginResult register(UserData newUser) {
     users.add(newUser);
 
-    return new LoginResult(newUser.username(), "");
+    String newToken = UUID.randomUUID().toString();
+    authTokens.add(newToken);
+
+    return new LoginResult(newUser.username(), newToken);
   }
 
   @Override
@@ -41,5 +44,13 @@ public class MemoryAuthDAO implements AuthDAO {
     if (!authTokens.contains(authToken)) {
       throw new LoginUnauthorizedException("User attempted to authorize with incorrect authToken");
     }
+  }
+
+  public void logout(String authToken) throws LoginUnauthorizedException {
+    if (!authTokens.contains(authToken)) {
+      throw new LoginUnauthorizedException("User attempted to logout with incorrect authToken");
+    }
+
+    authTokens.remove(authToken);
   }
 }

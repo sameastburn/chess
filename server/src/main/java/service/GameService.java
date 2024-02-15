@@ -1,12 +1,9 @@
 package service;
 
-import dataAccess.AuthDAO;
-import dataAccess.GameDAO;
-import dataAccess.MemoryAuthDAO;
-import dataAccess.MemoryGameDAO;
+import dataAccess.*;
 import model.*;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class GameService {
   private static final GameService instance = new GameService();
@@ -19,7 +16,15 @@ public class GameService {
     // ...
   }
 
-  public List<GameData> listGames() {
+  public ArrayList<GameData> listGames() {
     return gameDAO.listGames();
+  }
+
+  public int createGame(String gameName) {
+    return gameDAO.createGame(gameName);
+  }
+
+  public void joinGame(JoinGameRequest joinGameRequest) throws LoginUnauthorizedException {
+    gameDAO.joinGame(joinGameRequest);
   }
 }

@@ -23,5 +23,7 @@ public class UserService {
   public void authorize(String authToken) throws LoginUnauthorizedException {
     authDAO.authorize(authToken);
   }
-  public void logout(UserData user) {}
+  public void logout(String authToken) throws LoginUnauthorizedException {
+    authDAO.logout(authToken);
+  }
 }
