@@ -1,13 +1,9 @@
 package server;
 
-import chess.ChessGame;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import dataAccess.LoginException;
-import dataAccess.LoginUnauthorizedException;
-import dataAccess.RegisterAlreadyTakenException;
-import dataAccess.RegisterException;
+import dataAccess.*;
 import model.*;
 import service.GameService;
 import service.UserService;
@@ -35,6 +31,10 @@ public class RouteHandler {
 
     try {
       return userService.register(userFromResponse);
+    } catch (RegisterBadRequestException e) {
+      response.status(400);
+
+      return new FailureResponse("Error: bad request");
     } catch (RegisterAlreadyTakenException e) {
       response.status(403);
 
