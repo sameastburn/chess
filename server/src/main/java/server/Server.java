@@ -13,10 +13,6 @@ public class Server {
     // remember to still deserialize requests
     Gson gson = new Gson();
 
-    Spark.before((request, response) -> {
-      System.out.println(request.headers("Authorization"));
-    });
-
     Spark.delete("/db", routeHandler::db, gson::toJson);
     Spark.post("/user", routeHandler::user, gson::toJson);
     Spark.post("/session", routeHandler::session, gson::toJson);

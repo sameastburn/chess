@@ -32,13 +32,27 @@ public class MemoryGameDAO implements GameDAO {
     return newGameID;
   }
 
-  public void joinGame(String username, JoinGameRequest joinGameRequest) throws LoginUnauthorizedException {
-    GameData gameNotNull = findGame(joinGameRequest.gameID()).orElseThrow(() -> new LoginUnauthorizedException("Game not found within database."));
+  public void joinGame(String username, JoinGameRequest joinGameRequest) throws GameException {
+    GameData gameNotNull = findGame(joinGameRequest.gameID()).orElseThrow(() -> new GameBadGameIDException("User attempted to join a nonexistent game"));
 
-    if (joinGameRequest.playerColor().equals("WHITE")) {
+    if (joinGameRequest.playerColor() == null) {
+      // TODO: not sure what logic needs to be implemented for observers?
+    } else if (joinGameRequest.playerColor().equals("WHITE")) {
+      if (gameNotNull.whiteUsername != null) {
+        throw new GameColorTakenException("User attempted to join a game with a taken color");
+      }
+
       gameNotNull.whiteUsername = username;
     } else {
+      if (gameNotNull.blackUsername != null) {
+        throw new GameColorTakenException("User attempted to join a game with a taken color");
+      }
+
       gameNotNull.blackUsername = username;
     }
+  }
+
+  public void clear() {
+    games.clear();
   }
 }

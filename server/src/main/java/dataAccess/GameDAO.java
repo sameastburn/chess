@@ -8,5 +8,6 @@ import java.util.ArrayList;
 public interface GameDAO {
   public ArrayList<GameData> listGames();
   public int createGame(String gameName);
-  public void joinGame(String username, JoinGameRequest joinGameRequest) throws LoginUnauthorizedException;
+  public void joinGame(String username, JoinGameRequest joinGameRequest) throws GameException;
+  void clear();
 }

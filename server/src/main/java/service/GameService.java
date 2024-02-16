@@ -1,19 +1,23 @@
 package service;
 
-import dataAccess.*;
-import model.*;
+import dataAccess.GameDAO;
+import dataAccess.GameException;
+import dataAccess.MemoryGameDAO;
+import model.GameData;
+import model.JoinGameRequest;
 
 import java.util.ArrayList;
 
 public class GameService {
   private static final GameService instance = new GameService();
   private static final GameDAO gameDAO = new MemoryGameDAO();
+
   public static GameService getInstance() {
     return instance;
   }
 
   public void clear() {
-    // ...
+    gameDAO.clear();
   }
 
   public ArrayList<GameData> listGames() {
@@ -24,7 +28,7 @@ public class GameService {
     return gameDAO.createGame(gameName);
   }
 
-  public void joinGame(String username, JoinGameRequest joinGameRequest) throws LoginUnauthorizedException {
+  public void joinGame(String username, JoinGameRequest joinGameRequest) throws GameException {
     gameDAO.joinGame(username, joinGameRequest);
   }
 }

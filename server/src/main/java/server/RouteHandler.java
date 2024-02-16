@@ -2,6 +2,7 @@ package server;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import dataAccess.*;
 import model.*;
@@ -23,6 +24,9 @@ public class RouteHandler {
   }
 
   public Object db(Request request, Response response) {
+    userService.clear();
+    gameService.clear();
+
     return new JsonObject();
   }
 
@@ -91,7 +95,15 @@ public class RouteHandler {
       String authToken = request.headers("Authorization");
 
       JsonObject body = gson.fromJson(request.body(), JsonObject.class);
-      String gameName = body.get("gameName").getAsString();
+      JsonElement gameNameAsElement = body.get("gameName");
+
+      if (gameNameAsElement == null) {
+        response.status(400);
+
+        return new FailureResponse("Error: bad request");
+      }
+
+      String gameName = gameNameAsElement.getAsString();
 
       userService.authorize(authToken);
       int newGameID = gameService.createGame(gameName);
@@ -140,6 +152,16 @@ public class RouteHandler {
       response.status(401);
 
       return new FailureResponse("Error: unauthorized");
+    } catch (GameBadGameIDException e) {
+      response.status(400);
+
+      return new FailureResponse("Error: bad request");
+    } catch (GameColorTakenException e) {
+      response.status(403);
+
+      return new FailureResponse("Error: already taken");
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
   }
 }

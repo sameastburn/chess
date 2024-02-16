@@ -8,4 +8,5 @@ public interface AuthDAO {
   public void logout(String authToken) throws LoginUnauthorizedException;
   public void authorize(String authToken) throws LoginUnauthorizedException;
   String getUsernameFromToken(String authToken);
+  public void clear();
 }
