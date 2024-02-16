@@ -24,7 +24,7 @@ public class GameService {
     return gameDAO.createGame(gameName);
   }
 
-  public void joinGame(JoinGameRequest joinGameRequest) throws LoginUnauthorizedException {
-    gameDAO.joinGame(joinGameRequest);
+  public void joinGame(String username, JoinGameRequest joinGameRequest) throws LoginUnauthorizedException {
+    gameDAO.joinGame(username, joinGameRequest);
   }
 }

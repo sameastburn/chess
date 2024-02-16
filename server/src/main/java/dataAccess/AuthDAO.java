@@ -7,4 +7,5 @@ public interface AuthDAO {
   public LoginResult login(LoginRequest user) throws LoginException;
   public void logout(String authToken) throws LoginUnauthorizedException;
   public void authorize(String authToken) throws LoginUnauthorizedException;
+  String getUsernameFromToken(String authToken);
 }

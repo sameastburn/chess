@@ -32,18 +32,13 @@ public class MemoryGameDAO implements GameDAO {
     return newGameID;
   }
 
-  public void joinGame(JoinGameRequest joinGameRequest) throws LoginUnauthorizedException {
-    // TODO: need new exception for this
+  public void joinGame(String username, JoinGameRequest joinGameRequest) throws LoginUnauthorizedException {
     GameData gameNotNull = findGame(joinGameRequest.gameID()).orElseThrow(() -> new LoginUnauthorizedException("Game not found within database."));
 
-    // TODO: !!!!!!!!! pickup from here!
-    // TODO: NEED to rewrite whole tokens to be a map with token : username, as predicted
-    // TODO: then, pass in username to joinGameRequest, set whiteUsername/blackUsername to username
-
     if (joinGameRequest.playerColor().equals("WHITE")) {
-      gameNotNull.whiteUsername = joinGameRequest.playerColor();
+      gameNotNull.whiteUsername = username;
     } else {
-      gameNotNull.blackUsername = joinGameRequest.playerColor();
+      gameNotNull.blackUsername = username;
     }
   }
 }

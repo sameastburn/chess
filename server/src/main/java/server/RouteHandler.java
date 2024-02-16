@@ -25,20 +25,13 @@ public class RouteHandler {
   }
 
   public Object db(Request request, Response response) {
-    // TODO: I don't know why, but standard serialized objects are not being
-    // TODO: detected as JSON by the auto-grader, but massive ChessGame is
-    // TODO: take a better look at this
-    var game = new ChessGame();
-
-    return game;
+    return new JsonObject();
   }
 
   public Object user(Request request, Response response) {
     UserData userFromResponse = gson.fromJson(request.body(), UserData.class);
 
-    var ret = userService.register(userFromResponse);
-
-    return ret;
+    return userService.register(userFromResponse);
   }
 
   public Object session(Request request, Response response) {
@@ -130,8 +123,9 @@ public class RouteHandler {
       userService.authorize(authToken);
 
       JoinGameRequest joinGameRequest = gson.fromJson(request.body(), JoinGameRequest.class);
+      String username = userService.getUsernameFromToken(authToken);
 
-      gameService.joinGame(joinGameRequest);
+      gameService.joinGame(username, joinGameRequest);
 
       return new JsonObject();
     } catch (LoginUnauthorizedException e) {

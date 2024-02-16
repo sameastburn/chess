@@ -26,4 +26,8 @@ public class UserService {
   public void logout(String authToken) throws LoginUnauthorizedException {
     authDAO.logout(authToken);
   }
+
+  public String getUsernameFromToken(String authToken) {
+    return authDAO.getUsernameFromToken(authToken);
+  }
 }
