@@ -6,6 +6,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import dataAccess.LoginException;
 import dataAccess.LoginUnauthorizedException;
+import dataAccess.RegisterAlreadyTakenException;
+import dataAccess.RegisterException;
 import model.*;
 import service.GameService;
 import service.UserService;
@@ -28,10 +30,16 @@ public class RouteHandler {
     return new JsonObject();
   }
 
-  public Object user(Request request, Response response) {
+  public Object user(Request request, Response response) throws RegisterException {
     UserData userFromResponse = gson.fromJson(request.body(), UserData.class);
 
-    return userService.register(userFromResponse);
+    try {
+      return userService.register(userFromResponse);
+    } catch (RegisterAlreadyTakenException e) {
+      response.status(403);
+
+      return new FailureResponse("Error: already taken");
+    }
   }
 
   public Object session(Request request, Response response) {

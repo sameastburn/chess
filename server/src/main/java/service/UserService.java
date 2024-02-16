@@ -1,9 +1,6 @@
 package service;
 
-import dataAccess.AuthDAO;
-import dataAccess.LoginException;
-import dataAccess.LoginUnauthorizedException;
-import dataAccess.MemoryAuthDAO;
+import dataAccess.*;
 import model.*;
 
 public class UserService {
@@ -14,7 +11,7 @@ public class UserService {
     return instance;
   }
 
-  public LoginResult register(UserData user) {
+  public LoginResult register(UserData user) throws RegisterException {
     return authDAO.register(user);
   }
   public LoginResult login(LoginRequest loginRequest) throws LoginException {

@@ -17,11 +17,18 @@ public class MemoryAuthDAO implements AuthDAO {
   }
 
   @Override
-  public LoginResult register(UserData newUser) {
-    users.add(newUser);
+  public LoginResult register(UserData newUser) throws RegisterException {
+    Optional<UserData> foundUserByUsername = users.stream().filter(user -> user.username().equals(newUser.username())).findFirst();
+    Optional<UserData> foundUserByEmail = users.stream().filter(user -> user.email().equals(newUser.email())).findFirst();
+
+    if (foundUserByUsername.isPresent() || foundUserByEmail.isPresent()) {
+      throw new RegisterAlreadyTakenException("User attempted to register already taken information");
+    }
 
     String newToken = UUID.randomUUID().toString();
     authTokens.put(newToken, newUser.username());
+
+    users.add(newUser);
 
     return new LoginResult(newUser.username(), newToken);
   }
