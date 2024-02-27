@@ -54,7 +54,9 @@ public class GameServiceTests {
     GameService gameService = GameService.getInstance();
     gameService.createGame("new-game-1");
 
-    Assertions.assertTrue(gameService.listGames().size() == 1, "List games size wasn't 1 after creating a game");
+    int sizeDebugMe = gameService.listGames().size();
+
+    Assertions.assertTrue(sizeDebugMe == 1, "List games size wasn't 1 after creating a game");
   }
 
   @Test
@@ -69,9 +71,8 @@ public class GameServiceTests {
     GameService gameService = GameService.getInstance();
 
     int newGameID = gameService.createGame("new-game-1");
-    var isValidGameMaybe = gameService.listGames().get(newGameID - 1);
 
-    Assertions.assertTrue(isValidGameMaybe.gameID == newGameID, "Game wasn't found after creating a new game");
+    Assertions.assertTrue(gameService.listGames().get(newGameID - 1).gameID == newGameID, "Game wasn't found after creating a new game");
   }
 
   @Test
