@@ -1,6 +1,7 @@
 package service;
 
 import dataAccess.*;
+import dataAccessExceptions.LoginUnauthorizedException;
 import model.*;
 
 public class UserService {

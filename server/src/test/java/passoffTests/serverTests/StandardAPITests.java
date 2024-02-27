@@ -85,10 +85,6 @@ public class StandardAPITests {
                 "Server response code was not 200 OK");
         assertNotNull(htmlFromServer, "Server returned an empty file");
         assertTrue(htmlFromServer.contains("CS 240 Chess Server Web API"));
-
-        while (true) {
-            sleep(100);
-        }
     }
 
 

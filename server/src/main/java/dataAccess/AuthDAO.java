@@ -1,5 +1,6 @@
 package dataAccess;
 
+import dataAccessExceptions.LoginUnauthorizedException;
 import model.*;
 
 public interface AuthDAO {

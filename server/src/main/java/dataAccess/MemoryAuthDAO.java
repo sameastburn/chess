@@ -1,5 +1,8 @@
 package dataAccess;
 
+import dataAccessExceptions.LoginUnauthorizedException;
+import dataAccessExceptions.RegisterAlreadyTakenException;
+import dataAccessExceptions.RegisterBadRequestException;
 import model.LoginRequest;
 import model.LoginResult;
 import model.UserData;

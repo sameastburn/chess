@@ -1,8 +1,7 @@
 package passoffTests.serverTests;
 
-import dataAccess.GameException;
 import dataAccess.LoginException;
-import dataAccess.LoginUnauthorizedException;
+import dataAccessExceptions.LoginUnauthorizedException;
 import dataAccess.RegisterException;
 import model.LoginRequest;
 import model.LoginResult;
@@ -11,7 +10,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import service.GameService;
 import service.UserService;
 
 import static org.junit.jupiter.api.Assertions.*;

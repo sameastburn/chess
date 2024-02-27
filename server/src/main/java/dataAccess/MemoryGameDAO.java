@@ -1,12 +1,12 @@
 package dataAccess;
 
 import chess.ChessGame;
+import dataAccessExceptions.GameBadGameIDException;
+import dataAccessExceptions.GameColorTakenException;
 import model.GameData;
 import model.JoinGameRequest;
-import model.UserData;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 public class MemoryGameDAO implements GameDAO {
