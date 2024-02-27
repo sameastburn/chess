@@ -66,7 +66,6 @@ public class RouteHandler {
     try {
       userService.authorize(authToken);
 
-      // TODO: decide if I want to use a record here
       ArrayList<GameData> games = gameService.listGames();
 
       JsonArray gamesArray = new JsonArray();
@@ -108,7 +107,6 @@ public class RouteHandler {
       userService.authorize(authToken);
       int newGameID = gameService.createGame(gameName);
 
-      // TODO: decide if I want to use a record here
       JsonObject jsonObject = new JsonObject();
       jsonObject.addProperty("gameID", newGameID);
 

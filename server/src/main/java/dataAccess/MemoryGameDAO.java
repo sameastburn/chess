@@ -36,7 +36,7 @@ public class MemoryGameDAO implements GameDAO {
     GameData gameNotNull = findGame(joinGameRequest.gameID()).orElseThrow(() -> new GameBadGameIDException("User attempted to join a nonexistent game"));
 
     if (joinGameRequest.playerColor() == null) {
-      // TODO: not sure what logic needs to be implemented for observers?
+      // observers
     } else if (joinGameRequest.playerColor().equals("WHITE")) {
       if (gameNotNull.whiteUsername != null) {
         throw new GameColorTakenException("User attempted to join a game with a taken color");

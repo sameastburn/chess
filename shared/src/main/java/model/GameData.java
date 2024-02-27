@@ -2,10 +2,6 @@ package model;
 
 import chess.ChessGame;
 
-// TODO: not sure why the spec wants this to be a record
-// TODO: not really sure why we would want game data (very stateful) to be immutable
-// TODO: maybe run by TAs?
-
 public class GameData {
   public int gameID;
   public String whiteUsername;
