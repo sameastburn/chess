@@ -315,7 +315,7 @@ public class ChessPiece {
     newCol = col - 1;
 
     newEndPosition = new ChessPosition(newRow, newCol);
-    if (newRow >= 1 && newRow <= 8 && newCol >= 1 && newCol <= 8 && board.hasPieceAt(newEndPosition)) {
+    if (board.hasPieceAt(newEndPosition) && newRow >= 1 && newRow <= 8 && newCol >= 1 && newCol <= 8) {
       var capturePiece = board.getPiece(newEndPosition);
 
       if (capturePiece.getTeamColor() != thisColor) {
