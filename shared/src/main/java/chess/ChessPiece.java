@@ -64,9 +64,9 @@ public class ChessPiece {
     var row = myPosition.getRow();
     var col = myPosition.getColumn();
 
-    int[][] directions = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
+    int[][] kingDirections = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
 
-    for (int[] direction : directions) {
+    for (int[] direction : kingDirections) {
       int newRow = row + direction[0];
       int newCol = col + direction[1];
 
@@ -100,9 +100,9 @@ public class ChessPiece {
     var row = myPosition.getRow();
     var col = myPosition.getColumn();
 
-    int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
+    int[][] queenDirections = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
 
-    for (int[] direction : directions) {
+    for (int[] direction : queenDirections) {
       for (int distance = 1; distance <= 8; distance++) {
         int newRow = row + direction[0] * distance;
         int newCol = col + direction[1] * distance;
@@ -140,9 +140,9 @@ public class ChessPiece {
     var row = myPosition.getRow();
     var col = myPosition.getColumn();
 
-    int[][] directions = {{-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
+    int[][] bishopDirections = {{-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
 
-    for (int[] direction : directions) {
+    for (int[] direction : bishopDirections) {
       for (int distance = 1; distance <= 8; distance++) {
         int newRow = row + direction[0] * distance;
         int newCol = col + direction[1] * distance;
@@ -180,9 +180,9 @@ public class ChessPiece {
     var row = myPosition.getRow();
     var col = myPosition.getColumn();
 
-    int[][] directions = {{2, 1}, {2, -1}, {-2, 1}, {-2, -1}, {1, 2}, {1, -2}, {-1, 2}, {-1, -2}};
+    int[][] knightDirections = {{2, 1}, {2, -1}, {-2, 1}, {-2, -1}, {1, 2}, {1, -2}, {-1, 2}, {-1, -2}};
 
-    for (int[] direction : directions) {
+    for (int[] direction : knightDirections) {
       int newRow = row + direction[0];
       int newCol = col + direction[1];
 
@@ -216,9 +216,9 @@ public class ChessPiece {
     var row = myPosition.getRow();
     var col = myPosition.getColumn();
 
-    int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+    int[][] rookDirections = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
 
-    for (int[] direction : directions) {
+    for (int[] direction : rookDirections) {
       for (int distance = 1; distance <= 8; distance++) {
         int newRow = row + direction[0] * distance;
         int newCol = col + direction[1] * distance;
@@ -255,15 +255,6 @@ public class ChessPiece {
     var thisColor = getTeamColor();
     var row = myPosition.getRow();
     var col = myPosition.getColumn();
-
-    // pawn has the most multifaceted behavior
-    // four behaviors
-    // 1. forward movement
-    // 1.a. first move (two squares)
-    // 1.b. normal move (one square)
-    // 2. diagonal movement (capturing)
-    // 3. promotion
-    // 4. en passant (extra credit in phase 1 if I really want to...)
 
     // white: increments in row/col
     // black: decrements in row/col
