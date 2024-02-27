@@ -104,14 +104,14 @@ public class ChessPiece {
 
     for (int[] direction : queenDirections) {
       for (int distance = 1; distance <= 8; distance++) {
-        int newRow = row + direction[0] * distance;
-        int newCol = col + direction[1] * distance;
+        int newQueenRow = row + direction[0] * distance;
+        int newQueenCol = col + direction[1] * distance;
 
-        if (newRow < 1 || newRow > 8 || newCol < 1 || newCol > 8) {
+        if (newQueenRow < 1 || newQueenRow > 8 || newQueenCol < 1 || newQueenCol > 8) {
           break;
         }
 
-        var newEndPosition = new ChessPosition(newRow, newCol);
+        var newEndPosition = new ChessPosition(newQueenRow, newQueenCol);
         var newMove = new ChessMove(myPosition, newEndPosition, null);
 
         var possibleCollision = board.hasPieceAt(newEndPosition);
@@ -144,14 +144,14 @@ public class ChessPiece {
 
     for (int[] direction : bishopDirections) {
       for (int distance = 1; distance <= 8; distance++) {
-        int newRow = row + direction[0] * distance;
-        int newCol = col + direction[1] * distance;
+        int newBishopRow = row + direction[0] * distance;
+        int newBishopCol = col + direction[1] * distance;
 
-        if (newRow < 1 || newRow > 8 || newCol < 1 || newCol > 8) {
+        if (newBishopRow < 1 || newBishopRow > 8 || newBishopCol < 1 || newBishopCol > 8) {
           break;
         }
 
-        var newEndPosition = new ChessPosition(newRow, newCol);
+        var newEndPosition = new ChessPosition(newBishopRow, newBishopCol);
         var newMove = new ChessMove(myPosition, newEndPosition, null);
 
         var possibleCollision = board.hasPieceAt(newEndPosition);
@@ -183,14 +183,14 @@ public class ChessPiece {
     int[][] knightDirections = {{2, 1}, {2, -1}, {-2, 1}, {-2, -1}, {1, 2}, {1, -2}, {-1, 2}, {-1, -2}};
 
     for (int[] direction : knightDirections) {
-      int newRow = row + direction[0];
-      int newCol = col + direction[1];
+      int newKnightRow = row + direction[0];
+      int newKnightCol = col + direction[1];
 
-      if (newRow < 1 || newRow > 8 || newCol < 1 || newCol > 8) {
+      if (newKnightRow < 1 || newKnightRow > 8 || newKnightCol < 1 || newKnightCol > 8) {
         continue;
       }
 
-      var newEndPosition = new ChessPosition(newRow, newCol);
+      var newEndPosition = new ChessPosition(newKnightRow, newKnightCol);
       var newMove = new ChessMove(myPosition, newEndPosition, null);
 
       var possibleCollision = board.hasPieceAt(newEndPosition);
