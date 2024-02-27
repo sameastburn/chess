@@ -69,8 +69,9 @@ public class GameServiceTests {
     GameService gameService = GameService.getInstance();
 
     int newGameID = gameService.createGame("new-game-1");
+    var isValidGameMaybe = gameService.listGames().get(newGameID - 1);
 
-    Assertions.assertTrue(gameService.listGames().get(newGameID - 1).gameID == newGameID, "Game wasn't found after creating a new game");
+    Assertions.assertTrue(isValidGameMaybe.gameID == newGameID, "Game wasn't found after creating a new game");
   }
 
   @Test
