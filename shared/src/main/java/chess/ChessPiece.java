@@ -112,7 +112,7 @@ public class ChessPiece {
         }
 
         var newEndPosition = new ChessPosition(newQueenRow, newQueenCol);
-        var newMove = new ChessMove(myPosition, newEndPosition, null);
+        var newQueenMove = new ChessMove(myPosition, newEndPosition, null);
 
         var possibleCollision = board.hasPieceAt(newEndPosition);
         if (possibleCollision) {
@@ -120,12 +120,12 @@ public class ChessPiece {
 
           var isCollisionPieceEnemy = collisionPiece.getTeamColor() != thisColor;
           if (isCollisionPieceEnemy) {
-            moves.add(newMove);
+            moves.add(newQueenMove);
           }
 
           break;
         } else {
-          moves.add(newMove);
+          moves.add(newQueenMove);
         }
       }
     }
@@ -152,7 +152,7 @@ public class ChessPiece {
         }
 
         var newEndPosition = new ChessPosition(newBishopRow, newBishopCol);
-        var newMove = new ChessMove(myPosition, newEndPosition, null);
+        var newBishopMove = new ChessMove(myPosition, newEndPosition, null);
 
         var possibleCollision = board.hasPieceAt(newEndPosition);
         if (possibleCollision) {
@@ -160,12 +160,12 @@ public class ChessPiece {
 
           var isCollisionPieceEnemy = collisionPiece.getTeamColor() != thisColor;
           if (isCollisionPieceEnemy) {
-            moves.add(newMove);
+            moves.add(newBishopMove);
           }
 
           break;
         } else {
-          moves.add(newMove);
+          moves.add(newBishopMove);
         }
       }
     }
@@ -297,7 +297,7 @@ public class ChessPiece {
     int newCol = col + 1;
 
     newEndPosition = new ChessPosition(newRow, newCol);
-    if (newRow >= 1 && newRow <= 8 && newCol >= 1 && newCol <= 8 && board.hasPieceAt(newEndPosition)) {
+    if (newCol >= 1 && newCol <= 8 && newRow >= 1 && newRow <= 8 && board.hasPieceAt(newEndPosition)) {
       var capturePiece = board.getPiece(newEndPosition);
 
       if (capturePiece.getTeamColor() != thisColor) {
