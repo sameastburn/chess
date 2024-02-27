@@ -3,6 +3,7 @@ package passoffTests.serverTests;
 import dataAccess.GameException;
 import model.JoinGameRequest;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -12,6 +13,12 @@ import passoffTests.testClasses.TestException;
 import service.GameService;
 
 public class GameServiceTests {
+
+  @BeforeEach
+  public void setup() {
+    GameService.getInstance().clear();
+  }
+
   @Test
   public void getInstancePositive()  {
     GameService instance1 = GameService.getInstance();
@@ -54,9 +61,7 @@ public class GameServiceTests {
     GameService gameService = GameService.getInstance();
     gameService.createGame("new-game-1");
 
-    int sizeDebugMe = gameService.listGames().size();
-
-    Assertions.assertTrue(sizeDebugMe == 1, "List games size wasn't 1 after creating a game");
+    Assertions.assertTrue(gameService.listGames().size() == 1, "List games size wasn't 1 after creating a game");
   }
 
   @Test
@@ -106,7 +111,7 @@ public class GameServiceTests {
 
     gameService.joinGame("fake-username", joinRequest);
 
-    assertThrows(GameException.class, () -> gameService.joinGame("fake-username-2", joinRequest), "joinGame didn't throw with conflicting user trying to join game");
+    assertThrows(GameException.class, () -> gameService.joinGame("fake-username-2", joinRequest),"joinGame didn't throw with conflicting user trying to join game");
   }
 
 }

@@ -8,13 +8,20 @@ import model.LoginRequest;
 import model.LoginResult;
 import model.UserData;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import service.GameService;
 import service.UserService;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UserServiceTests {
+  @BeforeEach
+  public void setup() {
+    UserService.getInstance().clear();
+  }
+
   @Test
   public void getInstancePositive()  {
     UserService instance1 = UserService.getInstance();
