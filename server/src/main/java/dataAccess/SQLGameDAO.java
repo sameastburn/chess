@@ -141,8 +141,16 @@ public class SQLGameDAO implements GameDAO {
     String sql = "TRUNCATE TABLE games";
 
     try (var conn = DatabaseManager.getConnection()) {
+      try (var preparedStatementDisableChecks = conn.prepareStatement("SET FOREIGN_KEY_CHECKS = 0")) {
+        preparedStatementDisableChecks.executeUpdate();
+      }
+
       try (var preparedStatement = conn.prepareStatement(sql)) {
         preparedStatement.executeUpdate();
+      }
+
+      try (var preparedStatementEnableChecks = conn.prepareStatement("SET FOREIGN_KEY_CHECKS = 1")) {
+        preparedStatementEnableChecks.executeUpdate();
       }
     } catch (SQLException | DataAccessException e) {
       throw new RuntimeException(e);
@@ -163,14 +171,3 @@ public class SQLGameDAO implements GameDAO {
     }
   }
 }
-
-/*
-    try (var conn = DatabaseManager.getConnection()) {
-      try (var preparedStatement = conn.prepareStatement(sql)) {
-
-      }
-    } catch (SQLException | DataAccessException e) {
-      throw new RuntimeException(e);
-    }
-
- */

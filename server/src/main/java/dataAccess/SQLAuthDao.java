@@ -10,16 +10,23 @@ import model.UserData;
 
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.*;
+import java.util.Optional;
+import java.util.UUID;
 
 public class SQLAuthDao implements AuthDAO {
   private final String[] createStatements = {"""
     CREATE TABLE IF NOT EXISTS users (
-      `id` SERIAL PRIMARY KEY,
-      `username` VARCHAR(255) UNIQUE NOT NULL,
-      `password` VARCHAR(255) NOT NULL,
-      `email` VARCHAR(255) UNIQUE NOT NULL,
-      `authToken` VARCHAR(255) UNIQUE
+      id SERIAL PRIMARY KEY,
+      username VARCHAR(255) UNIQUE NOT NULL,
+      password VARCHAR(255) NOT NULL,
+      email VARCHAR(255) UNIQUE NOT NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+    """, """
+    CREATE TABLE IF NOT EXISTS auth_tokens (
+      token_id SERIAL PRIMARY KEY,
+      user_id BIGINT UNSIGNED NOT NULL,
+      token VARCHAR(255) UNIQUE NOT NULL,
+      FOREIGN KEY (user_id) REFERENCES users(id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
     """};
 
@@ -69,7 +76,7 @@ public class SQLAuthDao implements AuthDAO {
   }
 
   private void setAuthToken(String username, String token) {
-    String sql = "UPDATE users SET authToken = ? WHERE username = ?";
+    String sql = "INSERT INTO auth_tokens (user_id, token) SELECT id, ? FROM users WHERE username = ?";
 
     try (var conn = DatabaseManager.getConnection()) {
       try (var preparedStatement = conn.prepareStatement(sql)) {
@@ -142,7 +149,7 @@ public class SQLAuthDao implements AuthDAO {
   }
 
   public void authorize(String authToken) throws LoginUnauthorizedException {
-    String sql = "SELECT username FROM users WHERE authToken = ?";
+    String sql = "SELECT users.username FROM users JOIN auth_tokens ON users.id = auth_tokens.user_id WHERE auth_tokens.token = ?";
 
     try (var conn = DatabaseManager.getConnection()) {
       try (var preparedStatement = conn.prepareStatement(sql)) {
@@ -162,7 +169,16 @@ public class SQLAuthDao implements AuthDAO {
     // verify the authToken is valid (maybe overkill?)
     authorize(authToken);
 
-    setAuthToken(getUsernameFromToken(authToken), null);
+    String sql = "DELETE FROM auth_tokens WHERE token = ?";
+
+    try (var conn = DatabaseManager.getConnection()) {
+      try (var preparedStatement = conn.prepareStatement(sql)) {
+        preparedStatement.setString(1, authToken);
+        preparedStatement.executeUpdate();
+      }
+    } catch (SQLException | DataAccessException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public String getUsernameFromToken(String authToken) {
@@ -185,11 +201,19 @@ public class SQLAuthDao implements AuthDAO {
   }
 
   public void clear() {
-    String sql = "DROP TABLE IF EXISTS users";
+    String sql = "TRUNCATE TABLE users";
 
     try (var conn = DatabaseManager.getConnection()) {
+      try (var preparedStatementDisableChecks = conn.prepareStatement("SET FOREIGN_KEY_CHECKS = 0")) {
+        preparedStatementDisableChecks.executeUpdate();
+      }
+
       try (var preparedStatement = conn.prepareStatement(sql)) {
         preparedStatement.executeUpdate();
+      }
+
+      try (var preparedStatementEnableChecks = conn.prepareStatement("SET FOREIGN_KEY_CHECKS = 1")) {
+        preparedStatementEnableChecks.executeUpdate();
       }
 
       configureDatabase();
