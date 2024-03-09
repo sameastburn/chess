@@ -182,7 +182,7 @@ public class SQLAuthDao implements AuthDAO {
   }
 
   public String getUsernameFromToken(String authToken) {
-    String sql = "SELECT username FROM users WHERE authToken = ?";
+    String sql = "SELECT users.username FROM users JOIN auth_tokens ON users.id = auth_tokens.user_id WHERE auth_tokens.token = ?";
 
     try (var conn = DatabaseManager.getConnection()) {
       try (var preparedStatement = conn.prepareStatement(sql)) {
@@ -197,18 +197,20 @@ public class SQLAuthDao implements AuthDAO {
       throw new RuntimeException(e);
     }
 
-    return "";
+    throw new RuntimeException("Couldn't find token from username!");
   }
 
   public void clear() {
-    String sql = "TRUNCATE TABLE users";
-
     try (var conn = DatabaseManager.getConnection()) {
       try (var preparedStatementDisableChecks = conn.prepareStatement("SET FOREIGN_KEY_CHECKS = 0")) {
         preparedStatementDisableChecks.executeUpdate();
       }
 
-      try (var preparedStatement = conn.prepareStatement(sql)) {
+      try (var preparedStatement = conn.prepareStatement("TRUNCATE TABLE users")) {
+        preparedStatement.executeUpdate();
+      }
+
+      try (var preparedStatement = conn.prepareStatement("TRUNCATE TABLE auth_tokens")) {
         preparedStatement.executeUpdate();
       }
 

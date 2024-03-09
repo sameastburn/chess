@@ -46,13 +46,7 @@ public class SQLGameDAO implements GameDAO {
           Gson gson = new Gson();
           var gameData = gson.fromJson(rs.getString("gameState"), ChessGame.class);
 
-          String whiteUsername = rs.getString("whiteUsername");
-          String blackUsername = rs.getString("blackUsername");
-
-          whiteUsername = rs.wasNull() ? null : whiteUsername;
-          blackUsername = rs.wasNull() ? null : blackUsername;
-
-          GameData game = new GameData(rs.getInt("gameID"), whiteUsername, blackUsername, rs.getString("gameName"), gameData);
+          GameData game = new GameData(rs.getInt("gameID"), rs.getString("whiteUsername"), rs.getString("blackUsername"), rs.getString("gameName"), gameData);
           games.add(game);
         }
       }
@@ -75,14 +69,7 @@ public class SQLGameDAO implements GameDAO {
           Gson gson = new Gson();
           var gameData = gson.fromJson(rs.getString("gameState"), ChessGame.class);
 
-          String whiteUsername = rs.getString("whiteUsername");
-          String blackUsername = rs.getString("blackUsername");
-
-          whiteUsername = rs.wasNull() ? null : whiteUsername;
-          blackUsername = rs.wasNull() ? null : blackUsername;
-
-          GameData game = new GameData(rs.getInt("gameID"), whiteUsername, blackUsername, rs.getString("gameName"), gameData);
-
+          GameData game = new GameData(rs.getInt("gameID"), rs.getString("whiteUsername"), rs.getString("blackUsername"), rs.getString("gameName"), gameData);
           return Optional.of(game);
         }
       }
