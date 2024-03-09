@@ -32,11 +32,24 @@ public class SQLAuthDao implements AuthDAO {
       throw new RuntimeException(e);
     }
   }
-
+  
   private Optional<UserData> getUser(String username) {
-    Optional<UserData> foundUser = users.stream().filter(user -> user.username().equals(username)).findFirst();
+    String sql = "SELECT * FROM users WHERE username = ?";
 
-    return foundUser;
+    try (var conn = DatabaseManager.getConnection()) {
+      try (var preparedStatement = conn.prepareStatement(sql)) {
+        preparedStatement.setString(1, username);
+
+        var rs = preparedStatement.executeQuery();
+        if (rs.next()) {
+          return Optional.of(new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email")));
+        }
+      }
+    } catch (SQLException | DataAccessException e) {
+      throw new RuntimeException(e);
+    }
+
+    return Optional.empty();
   }
 
   private boolean userOrEmailExists(String username, String email) throws SQLException {
@@ -125,7 +138,7 @@ public class SQLAuthDao implements AuthDAO {
     }
 
     String newToken = UUID.randomUUID().toString();
-    authTokens.put(newToken, user.username());
+    setAuthToken(user.username(), newToken);
 
     return new LoginResult(userNotNull.username(), newToken);
   }
