@@ -20,8 +20,7 @@ public class SQLGameDAO implements GameDAO {
       gameName VARCHAR(255) NOT NULL,
       whiteUsername VARCHAR(255),
       blackUsername VARCHAR(255),
-      gameState TEXT,
-      CONSTRAINT UC_Game UNIQUE (whiteUsername, blackUsername)
+      gameState TEXT
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
     """};
   ArrayList<GameData> games = new ArrayList<>();
@@ -41,13 +40,19 @@ public class SQLGameDAO implements GameDAO {
 
     try (var conn = DatabaseManager.getConnection()) {
       try (var preparedStatement = conn.prepareStatement(sql)) {
-        var rs = preparedStatement.executeQuery(sql);
+        var rs = preparedStatement.executeQuery();
 
         while (rs.next()) {
           Gson gson = new Gson();
           var gameData = gson.fromJson(rs.getString("gameState"), ChessGame.class);
 
-          GameData game = new GameData(rs.getInt("gameID"), rs.getString("whiteUsername"), rs.getString("blackUsername"), rs.getString("gameName"), gameData);
+          String whiteUsername = rs.getString("whiteUsername");
+          String blackUsername = rs.getString("blackUsername");
+
+          whiteUsername = rs.wasNull() ? null : whiteUsername;
+          blackUsername = rs.wasNull() ? null : blackUsername;
+
+          GameData game = new GameData(rs.getInt("gameID"), whiteUsername, blackUsername, rs.getString("gameName"), gameData);
           games.add(game);
         }
       }
@@ -70,7 +75,13 @@ public class SQLGameDAO implements GameDAO {
           Gson gson = new Gson();
           var gameData = gson.fromJson(rs.getString("gameState"), ChessGame.class);
 
-          GameData game = new GameData(rs.getInt("gameID"), rs.getString("whiteUsername"), rs.getString("blackUsername"), rs.getString("gameName"), gameData);
+          String whiteUsername = rs.getString("whiteUsername");
+          String blackUsername = rs.getString("blackUsername");
+
+          whiteUsername = rs.wasNull() ? null : whiteUsername;
+          blackUsername = rs.wasNull() ? null : blackUsername;
+
+          GameData game = new GameData(rs.getInt("gameID"), whiteUsername, blackUsername, rs.getString("gameName"), gameData);
 
           return Optional.of(game);
         }
