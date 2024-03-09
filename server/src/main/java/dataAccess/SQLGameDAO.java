@@ -110,6 +110,11 @@ public class SQLGameDAO implements GameDAO {
   public void joinGame(String username, JoinGameRequest joinGameRequest) throws GameException {
     GameData gameNotNull = findGame(joinGameRequest.gameID()).orElseThrow(() -> new GameBadGameIDException("User attempted to join a nonexistent game"));
 
+    // observers
+    if (joinGameRequest.playerColor() == null) {
+      return;
+    }
+
     String sqlUpdate = "UPDATE games SET %s = ? WHERE gameID = ? AND %s IS NULL";
     String columnToUpdate = joinGameRequest.playerColor().equals("WHITE") ? "whiteUsername" : "blackUsername";
     String sql = String.format(sqlUpdate, columnToUpdate, columnToUpdate);
