@@ -6,7 +6,7 @@ import model.*;
 
 public class UserService {
   private static final UserService instance = new UserService();
-  private static final AuthDAO authDAO = new MemoryAuthDAO();
+  private static final AuthDAO authDAO = new SQLAuthDao();
 
   public static UserService getInstance() {
     return instance;

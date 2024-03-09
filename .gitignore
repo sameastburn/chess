@@ -127,3 +127,6 @@ shared/target/
 
 # don't need mac folder attributes
 .DS_Store
+
+# don't need to leak credentials (I would hope)
+db.properties
