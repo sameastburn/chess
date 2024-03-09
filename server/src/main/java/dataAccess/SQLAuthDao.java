@@ -32,7 +32,7 @@ public class SQLAuthDao implements AuthDAO {
       throw new RuntimeException(e);
     }
   }
-  
+
   private Optional<UserData> getUser(String username) {
     String sql = "SELECT * FROM users WHERE username = ?";
 
@@ -144,8 +144,19 @@ public class SQLAuthDao implements AuthDAO {
   }
 
   public void authorize(String authToken) throws LoginUnauthorizedException {
-    if (!authTokens.containsKey(authToken)) {
-      throw new LoginUnauthorizedException("User attempted to authorize with incorrect authToken");
+    String sql = "SELECT username FROM users WHERE authToken = ?";
+
+    try (var conn = DatabaseManager.getConnection()) {
+      try (var preparedStatement = conn.prepareStatement(sql)) {
+        preparedStatement.setString(1, authToken);
+
+        var rs = preparedStatement.executeQuery();
+        if (!rs.next()) {
+          throw new LoginUnauthorizedException("User attempted to authorize with incorrect authToken");
+        }
+      }
+    } catch (SQLException | DataAccessException e) {
+      throw new RuntimeException(e);
     }
   }
 
