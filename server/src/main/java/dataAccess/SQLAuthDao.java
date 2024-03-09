@@ -151,6 +151,18 @@ public class SQLAuthDao implements AuthDAO {
   public void clear() {
     users.clear();
     authTokens.clear();
+
+    String sql = "DROP TABLE IF EXISTS users";
+
+    try (var conn = DatabaseManager.getConnection()) {
+      try (var preparedStatement = conn.prepareStatement(sql)) {
+        preparedStatement.executeUpdate();
+      }
+
+      configureDatabase();
+    } catch (SQLException | DataAccessException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   private void configureDatabase() throws DataAccessException {
