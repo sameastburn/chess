@@ -161,15 +161,29 @@ public class SQLAuthDao implements AuthDAO {
   }
 
   public void logout(String authToken) throws LoginUnauthorizedException {
-    if (!authTokens.containsKey(authToken)) {
-      throw new LoginUnauthorizedException("User attempted to logout with incorrect authToken");
-    }
+    // verify the authToken is valid (maybe overkill?)
+    authorize(authToken);
 
-    authTokens.remove(authToken);
+    setAuthToken(getUsernameFromToken(authToken), null);
   }
 
   public String getUsernameFromToken(String authToken) {
-    return authTokens.getOrDefault(authToken, "");
+    String sql = "SELECT username FROM users WHERE authToken = ?";
+
+    try (var conn = DatabaseManager.getConnection()) {
+      try (var preparedStatement = conn.prepareStatement(sql)) {
+        preparedStatement.setString(1, authToken);
+
+        var rs = preparedStatement.executeQuery();
+        if (rs.next()) {
+          return rs.getString("username");
+        }
+      }
+    } catch (SQLException | DataAccessException e) {
+      throw new RuntimeException(e);
+    }
+
+    return "";
   }
 
   public void clear() {
