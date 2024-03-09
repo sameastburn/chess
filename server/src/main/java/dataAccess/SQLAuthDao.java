@@ -13,8 +13,6 @@ import java.sql.Statement;
 import java.util.*;
 
 public class SQLAuthDao implements AuthDAO {
-  private final List<UserData> users = new ArrayList<>();
-  private final Map<String, String> authTokens = new HashMap<>();
   private final String[] createStatements = {"""
     CREATE TABLE IF NOT EXISTS users (
       `id` SERIAL PRIMARY KEY,
@@ -187,9 +185,6 @@ public class SQLAuthDao implements AuthDAO {
   }
 
   public void clear() {
-    users.clear();
-    authTokens.clear();
-
     String sql = "DROP TABLE IF EXISTS users";
 
     try (var conn = DatabaseManager.getConnection()) {
