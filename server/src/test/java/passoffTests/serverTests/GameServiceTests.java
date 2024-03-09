@@ -98,7 +98,7 @@ public class GameServiceTests {
     JoinGameRequest joinRequest = new JoinGameRequest("WHITE", newGameID);
     gameService.joinGame("fake-username", joinRequest);
 
-    Assertions.assertTrue(gameService.listGames().get(newGameID - 1).whiteUsername == "fake-username", "White username didn't get replaced");
+    Assertions.assertEquals(gameService.listGames().get(newGameID - 1).whiteUsername,"fake-username", "White username didn't get replaced");
   }
 
   @Test

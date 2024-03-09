@@ -59,9 +59,27 @@ public class SQLGameDAO implements GameDAO {
   }
 
   private Optional<GameData> findGame(int gameID) {
-    Optional<GameData> foundGame = games.stream().filter(game -> game.gameID == gameID).findFirst();
+    String sql = "SELECT * FROM games WHERE gameID = ?";
 
-    return foundGame;
+    try (var conn = DatabaseManager.getConnection()) {
+      try (var preparedStatement = conn.prepareStatement(sql)) {
+        preparedStatement.setInt(1, gameID);
+
+        var rs = preparedStatement.executeQuery();
+        if (rs.next()) {
+          Gson gson = new Gson();
+          var gameData = gson.fromJson(rs.getString("gameState"), ChessGame.class);
+
+          GameData game = new GameData(rs.getInt("gameID"), rs.getString("whiteUsername"), rs.getString("blackUsername"), rs.getString("gameName"), gameData);
+
+          return Optional.of(game);
+        }
+      }
+    } catch (SQLException | DataAccessException e) {
+      throw new RuntimeException(e);
+    }
+
+    return Optional.empty();
   }
 
   public int createGame(String gameName) {
@@ -92,20 +110,23 @@ public class SQLGameDAO implements GameDAO {
   public void joinGame(String username, JoinGameRequest joinGameRequest) throws GameException {
     GameData gameNotNull = findGame(joinGameRequest.gameID()).orElseThrow(() -> new GameBadGameIDException("User attempted to join a nonexistent game"));
 
-    if (joinGameRequest.playerColor() == null) {
-      // observers
-    } else if (joinGameRequest.playerColor().equals("WHITE")) {
-      if (gameNotNull.whiteUsername != null) {
-        throw new GameColorTakenException("User attempted to join a game with a taken color");
-      }
+    String sqlUpdate = "UPDATE games SET %s = ? WHERE gameID = ? AND %s IS NULL";
+    String columnToUpdate = joinGameRequest.playerColor().equals("WHITE") ? "whiteUsername" : "blackUsername";
+    String sql = String.format(sqlUpdate, columnToUpdate, columnToUpdate);
 
-      gameNotNull.whiteUsername = username;
-    } else {
-      if (gameNotNull.blackUsername != null) {
-        throw new GameColorTakenException("User attempted to join a game with a taken color");
-      }
+    try (var conn = DatabaseManager.getConnection()) {
+      try (var preparedStatement = conn.prepareStatement(sql)) {
+        preparedStatement.setString(1, username);
+        preparedStatement.setInt(2, joinGameRequest.gameID());
 
-      gameNotNull.blackUsername = username;
+        int affectedRows = preparedStatement.executeUpdate();
+
+        if (affectedRows == 0) {
+          throw new GameColorTakenException("User attempted to join a game with a taken color");
+        }
+      }
+    } catch (SQLException | DataAccessException e) {
+      throw new RuntimeException(e);
     }
   }
 
