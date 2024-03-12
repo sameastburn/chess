@@ -197,7 +197,7 @@ public class SQLAuthDao implements AuthDAO {
       throw new RuntimeException(e);
     }
 
-    throw new RuntimeException("Couldn't find token from username!");
+    return "";
   }
 
   public void clear() {
