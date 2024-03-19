@@ -1,12 +1,40 @@
-import chess.*;
 import ui.UserInterface;
 
-public class Main {
-    public static void main(String[] args) {
-        var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
-        System.out.println("♕ 240 Chess Client: " + piece);
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
 
-        var userInterface = UserInterface.getInstance();
-        userInterface.draw();
+public class Main {
+  static UserInterface userInterface;
+
+  public static void main(String[] args) {
+    userInterface = UserInterface.getInstance();
+    userInterface.init(new PrintStream(System.out, true, StandardCharsets.UTF_8));
+
+    // boolean loggedIn = false;
+
+    while (preLogin()) {
+      // ...
     }
+  }
+
+  public static boolean preLogin() {
+    System.out.printf("[LOGGED OUT] >>> ");
+
+    Scanner scanner = new Scanner(System.in);
+    String line = scanner.nextLine();
+
+    if (line.equals("help")) {
+      userInterface.printHelp();
+    }
+
+
+    if (line.equals("quit")) {
+      return false;
+    }
+
+    System.out.printf("%n");
+
+    return true;
+  }
 }
