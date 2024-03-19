@@ -15,18 +15,35 @@ public class Main {
 
     clientAPI = ClientAPI.getInstance();
 
+    userInterface.printWelcomeHeader();
+
     while (loggedIn && postLogin() || preLogin()) {
       // ...
     }
   }
 
   public static boolean preLogin() {
-    System.out.printf("[LOGGED_OUT] >>> ");
+    System.out.print("[LOGGED_OUT] >>> ");
 
     Scanner scanner = new Scanner(System.in);
     String line = scanner.nextLine();
 
-    if (line.startsWith("login")) {
+    if (line.startsWith("register")) {
+      String[] loginArguments = line.split(" ");
+
+      if (loginArguments.length > 2) {
+        String username = loginArguments[1];
+        String password = loginArguments[2];
+
+        boolean registerSuccess = clientAPI.register(username, password);
+
+        if (registerSuccess) {
+          System.out.printf("Logged in as %s%n", username);
+
+          loggedIn = true;
+        }
+      }
+    } else if (line.startsWith("login")) {
       String[] loginArguments = line.split(" ");
 
       if (loginArguments.length > 2) {
@@ -36,7 +53,7 @@ public class Main {
         boolean loginSuccess = clientAPI.login(username, password);
 
         if (loginSuccess) {
-          System.out.printf("Login successful!%n");
+          System.out.printf("Logged in as %s%n", username);
 
           loggedIn = true;
         }
@@ -54,7 +71,7 @@ public class Main {
   }
 
   public static boolean postLogin() {
-    System.out.printf("[LOGGED_IN] >>> ");
+    System.out.print("[LOGGED_IN] >>> ");
 
     Scanner scanner = new Scanner(System.in);
     String line = scanner.nextLine();

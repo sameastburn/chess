@@ -17,7 +17,7 @@ public class UserInterface {
     out = outputStream;
   }
 
-  public void printPreLoginHeader() {
+  public void printWelcomeHeader() {
     out.printf(CROWN + "Welcome to 240 chess. Type Help to get started." + CROWN + "%n");
   }
 
