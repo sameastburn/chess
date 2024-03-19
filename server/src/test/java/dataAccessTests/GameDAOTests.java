@@ -38,9 +38,9 @@ public class GameDAOTests {
 
   @Test
   public void createGamePositive() {
-    int gameId = gameDAO.createGame("TestGame");
+    int id = gameDAO.createGame("TestGame");
 
-    Assertions.assertNotEquals(0, gameId, "createGame should return a non-zero gameId!");
+    Assertions.assertNotEquals(0, id, "createGame should return a non-zero gameId!");
   }
 
   @Test
@@ -63,9 +63,9 @@ public class GameDAOTests {
   @Test
   public void joinGameNegative() {
     String username = "testUser";
-    int gameId = gameDAO.createGame("TestGameUserJoined");
+    int id = gameDAO.createGame("TestGameUserJoined");
 
-    JoinGameRequest joinRequest = new JoinGameRequest("WHITE", gameId);
+    JoinGameRequest joinRequest = new JoinGameRequest("WHITE", id);
 
     Assertions.assertDoesNotThrow(() -> gameDAO.joinGame(username, joinRequest), "Initial joinGame should succeed!");
     Assertions.assertThrows(GameException.class, () -> gameDAO.joinGame(username, joinRequest), "joinGame should throw GameException if the user tries to join the same game again!");
