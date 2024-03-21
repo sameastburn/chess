@@ -1,7 +1,7 @@
-public class ClientAPI {
-  private static final ClientAPI instance = new ClientAPI();
+public class ServerFacade {
+  private static final ServerFacade instance = new ServerFacade();
 
-  public static ClientAPI getInstance() {
+  public static ServerFacade getInstance() {
     return instance;
   }
 

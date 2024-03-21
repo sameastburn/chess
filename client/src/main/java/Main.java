@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 public class Main {
   static UserInterface userInterface;
-  static ClientAPI clientAPI;
+  static ServerFacade serverFacade;
   static boolean loggedIn = false;
   static boolean quit = false;
 
@@ -14,7 +14,7 @@ public class Main {
     userInterface = UserInterface.getInstance();
     userInterface.init(new PrintStream(System.out, true, StandardCharsets.UTF_8));
 
-    clientAPI = ClientAPI.getInstance();
+    serverFacade = serverFacade.getInstance();
 
     userInterface.printWelcomeHeader();
 
@@ -40,7 +40,7 @@ public class Main {
         String username = loginArguments[1];
         String password = loginArguments[2];
 
-        boolean registerSuccess = clientAPI.register(username, password);
+        boolean registerSuccess = serverFacade.register(username, password);
 
         if (registerSuccess) {
           System.out.printf("Logged in as %s%n", username);
@@ -55,7 +55,7 @@ public class Main {
         String username = loginArguments[1];
         String password = loginArguments[2];
 
-        boolean loginSuccess = clientAPI.login(username, password);
+        boolean loginSuccess = serverFacade.login(username, password);
 
         if (loginSuccess) {
           System.out.printf("Logged in as %s%n", username);
