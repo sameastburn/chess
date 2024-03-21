@@ -21,9 +21,14 @@ public class UserInterface {
     out.printf(CROWN + "Welcome to 240 chess. Type Help to get started." + CROWN + "%n");
   }
 
-  public void printHelp() {
+  public void printHelpPreLogin() {
     out.printf("\tregister <USERNAME> <PASSWORD> <EMAIL> - to create an account%n");
     out.printf("\tlogin <USERNAME> <PASSWORD> - to play chess%n");
+    out.printf("\tquit - playing chess%n");
+    out.printf("\thelp - with possible commands%n");
+  }
+
+  public void printHelpPostLogin() {
     out.printf("\tquit - playing chess%n");
     out.printf("\thelp - with possible commands%n");
   }

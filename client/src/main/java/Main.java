@@ -58,9 +58,8 @@ public class Main {
           loggedIn = true;
         }
       }
-    }
-    if (line.equals("help")) {
-      userInterface.printHelp();
+    } else if (line.equals("help")) {
+      userInterface.printHelpPreLogin();
     } else if (line.equals("quit")) {
       return false;
     }
@@ -75,6 +74,24 @@ public class Main {
 
     Scanner scanner = new Scanner(System.in);
     String line = scanner.nextLine();
+
+    if (line.startsWith("create")) {
+
+    } else if (line.startsWith("list")) {
+
+    } else if (line.startsWith("join")) {
+      //
+    } else if (line.startsWith("observe")) {
+      //
+    } else if (line.startsWith("logout")) {
+      //
+    } else if (line.startsWith("help")) {
+      userInterface.printHelpPostLogin();
+    } else if (line.equals("quit")) {
+      return false;
+    }
+
+    System.out.printf("%n");
 
     return true;
   }
