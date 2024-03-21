@@ -1,6 +1,7 @@
 import com.google.gson.Gson;
 import exception.ResponseException;
 import model.LoginRequest;
+import model.LoginResult;
 import model.UserData;
 
 import java.io.IOException;
@@ -13,6 +14,7 @@ import java.net.URL;
 
 public class ServerFacade {
   private static final ServerFacade instance = new ServerFacade();
+  private String authToken = "";
 
   public static ServerFacade getInstance() {
     return instance;
@@ -42,15 +44,22 @@ public class ServerFacade {
   }
 
   public boolean login(String username, String password) {
-    return username.equals("test") && password.equals("test");
+    try {
+      var loginRequest = new LoginRequest(username, password);
+      var response = this.makeRequest("POST", "/session", loginRequest, LoginResult.class);
+
+      authToken = response.authToken();
+
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
   }
 
   public boolean register(String username, String password, String email) {
     try {
       var registerRequest = new UserData(username, password, email);
-
-      var path = "/user";
-      var response = this.makeRequest("POST", path, registerRequest, UserData.class);
+      this.makeRequest("POST", "/user", registerRequest, UserData.class);
 
       return true;
     } catch (Exception e) {

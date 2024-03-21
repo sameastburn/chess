@@ -14,7 +14,7 @@ public class Main {
     userInterface = UserInterface.getInstance();
     userInterface.init(new PrintStream(System.out, true, StandardCharsets.UTF_8));
 
-    serverFacade = serverFacade.getInstance();
+    serverFacade = ServerFacade.getInstance();
 
     userInterface.printWelcomeHeader();
 
@@ -66,7 +66,11 @@ public class Main {
           System.out.printf("Logged in as %s%n", username);
 
           loggedIn = true;
+        } else {
+          System.out.printf("There was an error logging in%n");
         }
+      } else {
+        System.out.printf("Not enough arguments provided for login%n");
       }
     } else if (line.equals("help")) {
       userInterface.printHelpPreLogin();
