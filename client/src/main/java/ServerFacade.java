@@ -1,4 +1,5 @@
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import exception.ResponseException;
 import model.LoginRequest;
 import model.LoginResult;
@@ -67,12 +68,29 @@ public class ServerFacade {
     }
   }
 
+  public boolean create(String gameId) {
+    try {
+      JsonObject jsonObject = new JsonObject();
+      jsonObject.addProperty("gameName", gameId);
+
+      this.makeRequest("POST", "/game", jsonObject, JsonObject.class);
+
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
   private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
     try {
       URL url = (new URI("http://localhost:1234" + path)).toURL();
       HttpURLConnection http = (HttpURLConnection) url.openConnection();
       http.setRequestMethod(method);
       http.setDoOutput(true);
+
+      if (!authToken.isEmpty()) {
+        http.addRequestProperty("Authorization", authToken);
+      }
 
       writeBody(request, http);
       http.connect();

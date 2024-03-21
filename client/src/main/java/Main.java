@@ -90,7 +90,21 @@ public class Main {
     String line = scanner.nextLine();
 
     if (line.startsWith("create")) {
+      String[] createArguments = line.split(" ");
 
+      if (createArguments.length > 1) {
+        String gameId = createArguments[1];
+
+        boolean creationSuccess = serverFacade.create(gameId);
+
+        if (creationSuccess) {
+          System.out.printf("Created a new game%n");
+        } else {
+          System.out.printf("There was an error creating a game%n");
+        }
+      } else {
+        System.out.printf("Not enough arguments provided for create%n");
+      }
     } else if (line.startsWith("list")) {
 
     } else if (line.startsWith("join")) {
