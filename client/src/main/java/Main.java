@@ -36,17 +36,22 @@ public class Main {
     if (line.startsWith("register")) {
       String[] loginArguments = line.split(" ");
 
-      if (loginArguments.length > 2) {
+      if (loginArguments.length > 3) {
         String username = loginArguments[1];
         String password = loginArguments[2];
+        String email = loginArguments[3];
 
-        boolean registerSuccess = serverFacade.register(username, password);
+        boolean registerSuccess = serverFacade.register(username, password, email);
 
         if (registerSuccess) {
           System.out.printf("Logged in as %s%n", username);
 
           loggedIn = true;
+        } else {
+          System.out.printf("There was an error registering%n");
         }
+      } else {
+        System.out.printf("Not enough arguments provided for register%n");
       }
     } else if (line.startsWith("login")) {
       String[] loginArguments = line.split(" ");
