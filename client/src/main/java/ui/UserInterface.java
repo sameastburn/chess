@@ -29,6 +29,11 @@ public class UserInterface {
   }
 
   public void printHelpPostLogin() {
+    out.printf("\tcreate <NAME> - a game%n");
+    out.printf("\tlist - games%n");
+    out.printf("\tjoin <ID> [WHITE|BLACK|<empty>] - a game%n");
+    out.printf("\tobserve <ID> - a game%n");
+    out.printf("\tlogout - when you are done%n");
     out.printf("\tquit - playing chess%n");
     out.printf("\thelp - with possible commands%n");
   }

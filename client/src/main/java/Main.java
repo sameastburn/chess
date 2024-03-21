@@ -8,6 +8,7 @@ public class Main {
   static UserInterface userInterface;
   static ClientAPI clientAPI;
   static boolean loggedIn = false;
+  static boolean quit = false;
 
   public static void main(String[] args) {
     userInterface = UserInterface.getInstance();
@@ -23,6 +24,10 @@ public class Main {
   }
 
   public static boolean preLogin() {
+    if (quit) {
+      return false;
+    }
+
     System.out.print("[LOGGED_OUT] >>> ");
 
     Scanner scanner = new Scanner(System.in);
@@ -84,10 +89,12 @@ public class Main {
     } else if (line.startsWith("observe")) {
       //
     } else if (line.startsWith("logout")) {
-      //
+      return false;
     } else if (line.startsWith("help")) {
       userInterface.printHelpPostLogin();
     } else if (line.equals("quit")) {
+      quit = true;
+
       return false;
     }
 
