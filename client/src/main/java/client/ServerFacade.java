@@ -1,3 +1,5 @@
+package client;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -17,9 +19,14 @@ import java.util.ArrayList;
 public class ServerFacade {
   private static final ServerFacade instance = new ServerFacade();
   private String authToken = "";
+  private Integer port = 0;
 
   public static ServerFacade getInstance() {
     return instance;
+  }
+
+  public void setPort(Integer port) {
+    this.port = port;
   }
 
   private static void writeBody(Object request, HttpURLConnection http) throws IOException {
@@ -102,7 +109,7 @@ public class ServerFacade {
       }
     } catch (Exception e) {
       System.out.println(e);
-      
+
       return null;
     }
   }
@@ -121,7 +128,7 @@ public class ServerFacade {
 
   private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
     try {
-      URL url = (new URI("http://localhost:1234" + path)).toURL();
+      URL url = (new URI("http://localhost:" + port + path)).toURL();
       HttpURLConnection http = (HttpURLConnection) url.openConnection();
       http.setRequestMethod(method);
       http.setDoOutput(true);

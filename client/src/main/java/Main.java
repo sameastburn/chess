@@ -1,5 +1,4 @@
-import chess.ChessBoard;
-import chess.ChessGame;
+import client.ServerFacade;
 import ui.EscapeSequences;
 import ui.UserInterface;
 
@@ -18,6 +17,7 @@ public class Main {
     userInterface.init(new PrintStream(System.out, true, StandardCharsets.UTF_8));
 
     serverFacade = ServerFacade.getInstance();
+    serverFacade.setPort(1234);
 
     System.out.print(EscapeSequences.ERASE_SCREEN);
 

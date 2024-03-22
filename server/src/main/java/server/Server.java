@@ -1,6 +1,8 @@
 package server;
 
 import com.google.gson.Gson;
+import service.GameService;
+import service.UserService;
 import spark.Service;
 import spark.Spark;
 
@@ -9,6 +11,9 @@ import java.nio.file.Paths;
 import static spark.Service.ignite;
 
 public class Server {
+  private static final UserService userService = UserService.getInstance();
+  private static final GameService gameService = GameService.getInstance();
+
   public int run(int desiredPort) {
     Service http = ignite();
 
@@ -36,5 +41,10 @@ public class Server {
 
   public void stop() {
     Spark.stop();
+  }
+
+  public void clear() {
+    userService.clear();
+    gameService.clear();
   }
 }
