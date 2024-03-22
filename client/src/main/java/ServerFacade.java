@@ -1,10 +1,7 @@
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import exception.ResponseException;
-import model.GameData;
-import model.LoginRequest;
-import model.LoginResult;
-import model.UserData;
+import model.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -90,6 +87,17 @@ public class ServerFacade {
       return response;
     } catch (Exception e) {
       return null;
+    }
+  }
+
+  public boolean join(String playerColor, int gameId) {
+    try {
+      var joinRequest = new JoinGameRequest(playerColor, gameId);
+      this.makeRequest("PUT", "/game", joinRequest, JsonObject.class);
+
+      return true;
+    } catch (Exception e) {
+      return false;
     }
   }
 

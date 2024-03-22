@@ -114,7 +114,22 @@ public class Main {
         System.out.printf("There was an error listing the games%n");
       }
     } else if (line.startsWith("join")) {
-      //
+      String[] joinArguments = line.split(" ");
+
+      if (joinArguments.length > 2) {
+        int gameId = Integer.parseInt(joinArguments[1]);
+        String playerColor = joinArguments[2];
+
+        boolean joinSuccess = serverFacade.join(playerColor, gameId);
+
+        if (joinSuccess) {
+          System.out.printf("Joined a game%n");
+        } else {
+          System.out.printf("There was an error joining a game%n");
+        }
+      } else {
+        System.out.printf("Not enough arguments provided for create%n");
+      }
     } else if (line.startsWith("observe")) {
       //
     } else if (line.startsWith("logout")) {
