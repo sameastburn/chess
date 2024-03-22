@@ -1,5 +1,7 @@
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import exception.ResponseException;
 import model.*;
 
@@ -82,13 +84,29 @@ public class ServerFacade {
 
   public ArrayList<GameData> list() {
     try {
-      var response = this.makeRequest("GET", "/game", new JsonObject(), ArrayList.class);
+      JsonObject response = this.makeRequest("GET", "/game", null, JsonObject.class);
 
-      return response;
+      if (response.has("games") && response.get("games").isJsonArray()) {
+        JsonArray gamesJsonArray = response.getAsJsonArray("games");
+        var gameListType = new TypeToken<ArrayList<GameData>>() {
+        }.getType();
+
+        Gson gson = new Gson();
+        ArrayList<GameData> gamesList = gson.fromJson(gamesJsonArray, gameListType);
+
+        return gamesList;
+      } else {
+        System.out.println("The games field is missing or not an array");
+
+        return null;
+      }
     } catch (Exception e) {
+      System.out.println(e);
+      
       return null;
     }
   }
+
 
   public boolean join(String playerColor, int gameId) {
     try {

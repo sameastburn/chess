@@ -109,7 +109,11 @@ public class Main {
       var games = serverFacade.list();
 
       if (games != null) {
-        System.out.println(games);
+        System.out.println("gameID | gameName | whiteUsername | blackUsername");
+
+        for (var game : games) {
+          System.out.println(String.valueOf(game.gameID) + " | " + game.gameName + " | " + game.whiteUsername + " | " + game.blackUsername);
+        }
       } else {
         System.out.printf("There was an error listing the games%n");
       }
@@ -128,10 +132,24 @@ public class Main {
           System.out.printf("There was an error joining a game%n");
         }
       } else {
-        System.out.printf("Not enough arguments provided for create%n");
+        System.out.printf("Not enough arguments provided for join%n");
       }
     } else if (line.startsWith("observe")) {
-      //
+      String[] observeArguments = line.split(" ");
+
+      if (observeArguments.length > 1) {
+        int gameId = Integer.parseInt(observeArguments[1]);
+
+        boolean observeSuccess = serverFacade.join(null, gameId);
+
+        if (observeSuccess) {
+          System.out.printf("Joined a game as an observer%n");
+        } else {
+          System.out.printf("There was an error joining a game as an observer%n");
+        }
+      } else {
+        System.out.printf("Not enough arguments provided for observe%n");
+      }
     } else if (line.startsWith("logout")) {
       return false;
     } else if (line.startsWith("help")) {
