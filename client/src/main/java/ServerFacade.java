@@ -1,6 +1,7 @@
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import exception.ResponseException;
+import model.GameData;
 import model.LoginRequest;
 import model.LoginResult;
 import model.UserData;
@@ -12,6 +13,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
 
 public class ServerFacade {
   private static final ServerFacade instance = new ServerFacade();
@@ -78,6 +80,16 @@ public class ServerFacade {
       return true;
     } catch (Exception e) {
       return false;
+    }
+  }
+
+  public ArrayList<GameData> list() {
+    try {
+      var response = this.makeRequest("GET", "/game", new JsonObject(), ArrayList.class);
+
+      return response;
+    } catch (Exception e) {
+      return null;
     }
   }
 

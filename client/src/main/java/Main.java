@@ -106,7 +106,13 @@ public class Main {
         System.out.printf("Not enough arguments provided for create%n");
       }
     } else if (line.startsWith("list")) {
+      var games = serverFacade.list();
 
+      if (games != null) {
+        System.out.println(games);
+      } else {
+        System.out.printf("There was an error listing the games%n");
+      }
     } else if (line.startsWith("join")) {
       //
     } else if (line.startsWith("observe")) {
