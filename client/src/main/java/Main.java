@@ -1,3 +1,6 @@
+import chess.ChessBoard;
+import chess.ChessGame;
+import ui.EscapeSequences;
 import ui.UserInterface;
 
 import java.io.PrintStream;
@@ -15,6 +18,8 @@ public class Main {
     userInterface.init(new PrintStream(System.out, true, StandardCharsets.UTF_8));
 
     serverFacade = ServerFacade.getInstance();
+
+    System.out.print(EscapeSequences.ERASE_SCREEN);
 
     userInterface.printWelcomeHeader();
 
@@ -112,7 +117,7 @@ public class Main {
         System.out.println("gameID | gameName | whiteUsername | blackUsername");
 
         for (var game : games) {
-          System.out.println(String.valueOf(game.gameID) + " | " + game.gameName + " | " + game.whiteUsername + " | " + game.blackUsername);
+          System.out.println(game.gameID + " | " + game.gameName + " | " + game.whiteUsername + " | " + game.blackUsername);
         }
       } else {
         System.out.printf("There was an error listing the games%n");
@@ -120,6 +125,7 @@ public class Main {
     } else if (line.startsWith("join")) {
       String[] joinArguments = line.split(" ");
 
+      // not sure why "<empty>" exists when we already have an observer command... maybe edit later?
       if (joinArguments.length > 2) {
         int gameId = Integer.parseInt(joinArguments[1]);
         String playerColor = joinArguments[2];
@@ -127,7 +133,11 @@ public class Main {
         boolean joinSuccess = serverFacade.join(playerColor, gameId);
 
         if (joinSuccess) {
+          System.out.print(EscapeSequences.ERASE_SCREEN);
+
           System.out.printf("Joined a game%n");
+
+          userInterface.drawBothChessBoards();
         } else {
           System.out.printf("There was an error joining a game%n");
         }
@@ -143,7 +153,11 @@ public class Main {
         boolean observeSuccess = serverFacade.join(null, gameId);
 
         if (observeSuccess) {
+          System.out.print(EscapeSequences.ERASE_SCREEN);
+
           System.out.printf("Joined a game as an observer%n");
+
+          userInterface.drawBothChessBoards();
         } else {
           System.out.printf("There was an error joining a game as an observer%n");
         }
