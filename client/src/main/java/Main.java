@@ -23,8 +23,12 @@ public class Main {
 
     userInterface.printWelcomeHeader();
 
-    while (loggedIn && postLogin() || preLogin()) {
-      // ...
+    while (!quit) {
+      if (loggedIn) {
+        postLogin();
+      } else {
+        preLogin();
+      }
     }
   }
 
@@ -49,9 +53,15 @@ public class Main {
         boolean registerSuccess = serverFacade.register(username, password, email);
 
         if (registerSuccess) {
-          System.out.printf("Logged in as %s%n", username);
+          boolean registerLoginSuccess = serverFacade.login(username, password);
 
-          loggedIn = true;
+          if (registerLoginSuccess) {
+            System.out.printf("Logged in as %s%n", username);
+
+            loggedIn = true;
+          } else {
+            System.out.printf("There was an error logging in%n");
+          }
         } else {
           System.out.printf("There was an error registering%n");
         }
@@ -165,7 +175,7 @@ public class Main {
         System.out.printf("Not enough arguments provided for observe%n");
       }
     } else if (line.startsWith("logout")) {
-      return false;
+      loggedIn = false;
     } else if (line.startsWith("help")) {
       userInterface.printHelpPostLogin();
     } else if (line.equals("quit")) {

@@ -61,6 +61,8 @@ public class ServerFacade {
 
       return true;
     } catch (Exception e) {
+      System.out.println(e);
+
       return false;
     }
   }
@@ -72,6 +74,8 @@ public class ServerFacade {
 
       return true;
     } catch (Exception e) {
+      System.out.println(e);
+
       return false;
     }
   }
@@ -85,6 +89,8 @@ public class ServerFacade {
 
       return true;
     } catch (Exception e) {
+      System.out.println(e);
+
       return false;
     }
   }
@@ -122,6 +128,8 @@ public class ServerFacade {
 
       return true;
     } catch (Exception e) {
+      System.out.println(e);
+
       return false;
     }
   }
