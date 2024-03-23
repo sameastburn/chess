@@ -1,11 +1,9 @@
 package clientTests;
 
 import client.ServerFacade;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import server.Server;
+import service.UserService;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -33,6 +31,20 @@ public class ServerFacadeTests {
   @BeforeEach
   void clearDatabase() {
     server.clear();
+  }
+
+  public void getInstancePositive()  {
+    ServerFacade instance1 = ServerFacade.getInstance();
+    ServerFacade instance2 = ServerFacade.getInstance();
+
+    assertSame(instance1, instance2);
+  }
+
+  @Test
+  public void getInstanceNegative() {
+    ServerFacade serverFacadeNegative = ServerFacade.getInstance();
+
+    Assertions.assertNotNull(serverFacadeNegative);
   }
 
   @Test
