@@ -137,4 +137,16 @@ public class ServerFacadeTests {
     var joinWithoutAuthorization = facade.join("black", 1);
     assertFalse(joinWithoutAuthorization);
   }
+
+  @Test
+  void isSuccessfulPositive() {
+    var codePositive = facade.isSuccessful(200);
+    assertTrue(codePositive);
+  }
+
+  @Test
+  void isSuccessfulNegative() {
+    var codePositive = facade.isSuccessful(404);
+    assertFalse(codePositive);
+  }
 }
