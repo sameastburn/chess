@@ -19,9 +19,17 @@ public class Main {
     serverFacade = ServerFacade.getInstance();
     serverFacade.setPort(1234);
 
+    if (!serverFacade.connect()) {
+      System.out.print("There was an error connecting to the server!");
+
+      return;
+    }
+
     System.out.print(EscapeSequences.ERASE_SCREEN);
 
     userInterface.printWelcomeHeader();
+
+    serverFacade.send("hey i'm here");
 
     while (!quit) {
       if (loggedIn) {
@@ -90,6 +98,8 @@ public class Main {
     } else if (line.equals("help")) {
       userInterface.printHelpPreLogin();
     } else if (line.equals("quit")) {
+      quit = true;
+
       return false;
     }
 

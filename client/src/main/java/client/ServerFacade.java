@@ -7,6 +7,10 @@ import com.google.gson.reflect.TypeToken;
 import exception.ResponseException;
 import model.*;
 
+import javax.websocket.ContainerProvider;
+import javax.websocket.MessageHandler;
+import javax.websocket.Session;
+import javax.websocket.WebSocketContainer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -16,17 +20,16 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class ServerFacade {
+import javax.websocket.*;
+
+public class ServerFacade extends Endpoint {
   private static final ServerFacade instance = new ServerFacade();
   private String authToken = "";
   private Integer port = 0;
+  private Session session;
 
   public static ServerFacade getInstance() {
     return instance;
-  }
-
-  public void setPort(Integer port) {
-    this.port = port;
   }
 
   private static void writeBody(Object request, HttpURLConnection http) throws IOException {
@@ -50,6 +53,42 @@ public class ServerFacade {
       }
     }
     return response;
+  }
+
+  public boolean connect() {
+    try {
+      URI uri = new URI("ws://localhost:8080/connect");
+      WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+      this.session = container.connectToServer(this, uri);
+
+      this.session.addMessageHandler(new MessageHandler.Whole<String>() {
+        public void onMessage(String message) {
+          System.out.println(message);
+        }
+      });
+
+      return true;
+    } catch (Exception e) {
+      System.out.println(e);
+
+      return false;
+    }
+  }
+
+  public boolean send(String message) {
+    try {
+      this.session.getBasicRemote().sendText(message);
+
+      return true;
+    } catch (Exception e) {
+      System.out.println(e);
+
+      return false;
+    }
+  }
+
+  public void setPort(Integer port) {
+    this.port = port;
   }
 
   public boolean login(String username, String password) {
@@ -163,5 +202,10 @@ public class ServerFacade {
 
   public boolean isSuccessful(int status) {
     return status / 100 == 2;
+  }
+
+  @Override
+  public void onOpen(Session session, EndpointConfig endpointConfig) {
+
   }
 }
