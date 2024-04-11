@@ -12,6 +12,7 @@ import service.UserService;
 import webSocketMessages.serverMessages.ErrorMessage;
 import webSocketMessages.serverMessages.LoadGameMessage;
 import webSocketMessages.serverMessages.NotificationMessage;
+import webSocketMessages.userCommands.JoinObserverCommand;
 import webSocketMessages.userCommands.JoinPlayerCommand;
 import webSocketMessages.userCommands.UserGameCommand;
 
@@ -33,11 +34,11 @@ public class WebsocketHandler {
     session.getRemote().sendString(gson.toJson(loadGameMessage));
   }
 
-  public void sendNotification(String selfUsername, String message) throws IOException {
+  public void sendNotification(String excludedUser, String message) throws IOException {
     NotificationMessage notificationMessage = new NotificationMessage();
     notificationMessage.message = message;
 
-    connectionManager.broadcast(selfUsername, notificationMessage);
+    connectionManager.broadcast(excludedUser, notificationMessage);
   }
 
   public void sendError(Session session, String message) throws IOException {
@@ -72,9 +73,7 @@ public class WebsocketHandler {
 
           GameData gameNotNull = gameService.findGame(joinCommand.gameID).orElseThrow(() -> new GameBadGameIDException("User attempted to join a nonexistent game"));
 
-          if (playerColor == null) {
-            // TODO: actual observers?
-          } else if (playerColor == ChessGame.TeamColor.WHITE) {
+           if (playerColor == ChessGame.TeamColor.WHITE) {
             if (!gameNotNull.whiteUsername.equals(username)) {
               throw new RuntimeException("White spot already taken!");
             }
@@ -85,7 +84,28 @@ public class WebsocketHandler {
           }
 
           sendLoadGame(session, gameNotNull);
-          sendNotification(username, username + " joined game: " + joinCommand.gameID);
+          sendNotification(username, username + "joined game '" + joinCommand.gameID + "' as '" + playerColor + "'");
+
+          break;
+        }
+        case JOIN_OBSERVER: {
+          // TODO: remove me, debug!
+          System.out.println("JOIN_OBSERVER");
+
+          JoinObserverCommand joinCommand = gson.fromJson(message, JoinObserverCommand.class);
+          String authString = joinCommand.getAuthString();
+
+          userService.authorize(authString);
+
+          String username = userService.getUsernameFromToken(joinCommand.getAuthString());
+          connectionManager.add(username, session);
+
+          GameData gameNotNull = gameService.findGame(joinCommand.gameID).orElseThrow(() -> new GameBadGameIDException("User attempted to join a nonexistent game"));
+
+          sendLoadGame(session, gameNotNull);
+          sendNotification(username, username + " is now observing game '" + joinCommand.gameID + "'");
+
+          break;
         }
       }
     } catch (Exception e) {
