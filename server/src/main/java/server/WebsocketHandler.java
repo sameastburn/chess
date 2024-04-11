@@ -69,10 +69,6 @@ public class WebsocketHandler {
 
   @OnWebSocketMessage
   public void onMessage(Session session, String message) throws Exception {
-    // TODO: delete this debug stuff when done
-    // System.out.printf("Received: %s\n", message);
-    // session.getRemote().sendString("WebSocket response: " + message);
-
     try {
       UserGameCommand gameCommand = gson.fromJson(message, UserGameCommand.class);
       String authString = gameCommand.getAuthString();
@@ -85,9 +81,6 @@ public class WebsocketHandler {
           JoinPlayerCommand joinCommand = gson.fromJson(message, JoinPlayerCommand.class);
           Integer gameID = joinCommand.gameID;
           ChessGame.TeamColor playerColor = joinCommand.playerColor;
-
-          // TODO: remove me, debug!
-          System.out.println("JOIN_PLAYER");
 
           connectionManager.add(username, session, gameID);
 
@@ -109,9 +102,6 @@ public class WebsocketHandler {
           break;
         }
         case JOIN_OBSERVER: {
-          // TODO: remove me, debug!
-          System.out.println("JOIN_OBSERVER");
-
           JoinObserverCommand joinCommand = gson.fromJson(message, JoinObserverCommand.class);
           Integer gameID = joinCommand.gameID;
 
@@ -125,9 +115,6 @@ public class WebsocketHandler {
           break;
         }
         case MAKE_MOVE: {
-          // TODO: remove me, debug!
-          System.out.println("MAKE_MOVE");
-
           MakeMoveCommand moveCommand = gson.fromJson(message, MakeMoveCommand.class);
           Integer gameID = moveCommand.gameID;
 

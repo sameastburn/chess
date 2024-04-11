@@ -1,13 +1,12 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 import model.GameData;
 
 import java.io.PrintStream;
 import java.util.EnumMap;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static ui.EscapeSequences.CROWN;
 
@@ -19,6 +18,7 @@ public class UserInterface {
   public static volatile GameData gameData;
   public static ChessGame.TeamColor myTeamColor;
   public static boolean observing = false;
+  private static ChessPosition highlightStartPosition;
 
   static {
     whitePiecesToUnicode.put(ChessPiece.PieceType.KING, EscapeSequences.WHITE_KING);
@@ -50,14 +50,14 @@ public class UserInterface {
     out = outputStream;
   }
 
+  public synchronized GameData getGameData() {
+    return gameData;
+  }
+
   public synchronized void setGameData(GameData gameDataArg) {
     gameData = gameDataArg;
 
     drawChessBoards();
-  }
-
-  public synchronized GameData getGameData() {
-    return gameData;
   }
 
   public void printWelcomeHeader() {
@@ -82,7 +82,13 @@ public class UserInterface {
   }
 
   public void drawChessBoard(ChessBoard chessBoard, ChessGame.TeamColor perspective) {
+    drawChessBoard(chessBoard, perspective, Set.of());
+  }
+
+  public void drawChessBoard(ChessBoard chessBoard, ChessGame.TeamColor perspective, Set<ChessPosition> highlightPositions) {
     drawTopBottomBorder(perspective);
+
+    boolean drawYellow = highlightPositions.size() > 0;
 
     for (int row = 1; row <= 8; row++) {
       int displayRow = perspective == ChessGame.TeamColor.WHITE ? 9 - row : row;
@@ -90,9 +96,22 @@ public class UserInterface {
 
       for (int col = 1; col <= 8; col++) {
         int displayCol = perspective == ChessGame.TeamColor.WHITE ? col : 9 - col;
+
         ChessPiece piece = chessBoard.getPiece(new ChessPosition(displayRow, displayCol));
         String pieceCharacter = piece != null ? getUnicodeCharacter(piece.getPieceType(), piece.getTeamColor()) : EscapeSequences.EMPTY;
-        String backgroundColor = (displayRow + col) % 2 == 0 ? EscapeSequences.SET_BG_COLOR_LIGHT_GREY : EscapeSequences.SET_BG_COLOR_DARK_GREY;
+
+        var currentPosition = new ChessPosition(displayRow, displayCol);
+
+        boolean shouldHighlight = highlightPositions.contains(currentPosition);
+        String backgroundColor;
+
+        if (shouldHighlight) {
+          backgroundColor = EscapeSequences.SET_BG_COLOR_GREEN;
+        } else if (drawYellow && currentPosition.equals(highlightStartPosition)) {
+          backgroundColor = EscapeSequences.SET_BG_COLOR_YELLOW;
+        } else {
+          backgroundColor = (displayRow + col) % 2 == 0 ? EscapeSequences.SET_BG_COLOR_LIGHT_GREY : EscapeSequences.SET_BG_COLOR_DARK_GREY;
+        }
 
         System.out.print(backgroundColor + pieceCharacter + EscapeSequences.RESET_BG_COLOR);
       }
@@ -119,6 +138,8 @@ public class UserInterface {
   }
 
   public void drawChessBoards() {
+    System.out.println();
+
     if (observing) {
       drawChessBoard(gameData.game.getBoard(), ChessGame.TeamColor.BLACK);
 
@@ -128,6 +149,23 @@ public class UserInterface {
     } else {
       drawChessBoard(gameData.game.getBoard(), myTeamColor);
     }
+
+    System.out.println();
+  }
+
+  public boolean highlightLegalMoves(ChessPosition startPosition) {
+    var legalMoves = gameData.game.validMoves(startPosition);
+
+    if (legalMoves.isEmpty()) {
+      return false;
+    }
+
+    Set<ChessPosition> legalPositions = legalMoves.stream().map(ChessMove::getEndPosition).collect(Collectors.toSet());
+
+    highlightStartPosition = startPosition;
+    drawChessBoard(gameData.game.getBoard(), myTeamColor, legalPositions);
+
+    return true;
   }
 
   public void printHelpInGame() {
@@ -136,6 +174,6 @@ public class UserInterface {
     out.printf("\tleave - leave the game%n");
     out.printf("\tmove - <PIECE> <POSITION> - move a piece at position to new position%n");
     out.printf("\tresign - forfeit%n");
-    out.printf("\tmoves - display all visible moves%n");
+    out.printf("\tmoves <POSITION> - display all visible moves%n");
   }
 }

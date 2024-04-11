@@ -120,104 +120,108 @@ public class Main {
     Scanner scanner = new Scanner(System.in);
     String line = scanner.nextLine();
 
-    if (line.startsWith("create")) {
-      String[] createArguments = line.split(" ");
+    try {
+      if (line.startsWith("create")) {
+        String[] createArguments = line.split(" ");
 
-      if (createArguments.length > 1) {
-        String gameId = createArguments[1];
+        if (createArguments.length > 1) {
+          String gameId = createArguments[1];
 
-        boolean creationSuccess = serverFacade.create(gameId);
+          boolean creationSuccess = serverFacade.create(gameId);
 
-        if (creationSuccess) {
-          System.out.printf("Created a new game%n");
+          if (creationSuccess) {
+            System.out.printf("Created a new game%n");
+          } else {
+            System.out.printf("There was an error creating a game%n");
+          }
         } else {
-          System.out.printf("There was an error creating a game%n");
+          System.out.printf("Not enough arguments provided for create%n");
         }
-      } else {
-        System.out.printf("Not enough arguments provided for create%n");
-      }
-    } else if (line.startsWith("list")) {
-      var games = serverFacade.list();
+      } else if (line.startsWith("list")) {
+        var games = serverFacade.list();
 
-      if (games != null) {
-        System.out.println("gameID | gameName | whiteUsername | blackUsername");
+        if (games != null) {
+          System.out.println("gameID | gameName | whiteUsername | blackUsername");
 
-        for (var game : games) {
-          System.out.println(game.gameID + " | " + game.gameName + " | " + game.whiteUsername + " | " + game.blackUsername);
+          for (var game : games) {
+            System.out.println(game.gameID + " | " + game.gameName + " | " + game.whiteUsername + " | " + game.blackUsername);
+          }
+        } else {
+          System.out.printf("There was an error listing the games%n");
         }
-      } else {
-        System.out.printf("There was an error listing the games%n");
-      }
-    } else if (line.startsWith("join")) {
-      String[] joinArguments = line.split(" ");
+      } else if (line.startsWith("join")) {
+        String[] joinArguments = line.split(" ");
 
-      if (joinArguments.length > 2) {
-        int gameId = Integer.parseInt(joinArguments[1]);
-        String playerColor = joinArguments[2];
-        ChessGame.TeamColor colorAsEnum = playerColor.toLowerCase().equals("white") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+        if (joinArguments.length > 2) {
+          int gameId = Integer.parseInt(joinArguments[1]);
+          String playerColor = joinArguments[2];
+          ChessGame.TeamColor colorAsEnum = playerColor.toLowerCase().equals("white") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
 
-        boolean joinSuccess = serverFacade.join(playerColor, gameId);
+          boolean joinSuccess = serverFacade.join(playerColor, gameId);
 
-        if (joinSuccess) {
-          serverFacade.joinGame(gameId, colorAsEnum);
+          if (joinSuccess) {
+            serverFacade.joinGame(gameId, colorAsEnum);
 
-          userInterface.myTeamColor = colorAsEnum;
-          userInterface.observing = false;
-          inGame = true;
+            userInterface.myTeamColor = colorAsEnum;
+            userInterface.observing = false;
+            inGame = true;
 
-          while (!serverFacade.receivedGame) {
-            synchronized (serverFacade.receivedGameLock) {
-              try {
-                while (!serverFacade.receivedGame) {
-                  serverFacade.receivedGameLock.wait();
+            while (!serverFacade.receivedGame) {
+              synchronized (serverFacade.receivedGameLock) {
+                try {
+                  while (!serverFacade.receivedGame) {
+                    serverFacade.receivedGameLock.wait();
+                  }
+                } catch (InterruptedException e) {
+                  Thread.currentThread().interrupt();
+
+                  System.out.println(e);
                 }
-              } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-
-                System.out.println(e);
               }
             }
+
+            System.out.print(EscapeSequences.ERASE_SCREEN);
+
+            System.out.printf("Joined a game%n");
+
+            // redraw = true;
+          } else {
+            System.out.printf("There was an error joining a game%n");
           }
-
-          System.out.print(EscapeSequences.ERASE_SCREEN);
-
-          System.out.printf("Joined a game%n");
-
-          // redraw = true;
         } else {
-          System.out.printf("There was an error joining a game%n");
+          System.out.printf("Not enough arguments provided for join%n");
         }
-      } else {
-        System.out.printf("Not enough arguments provided for join%n");
-      }
-    } else if (line.startsWith("observe")) {
-      String[] observeArguments = line.split(" ");
+      } else if (line.startsWith("observe")) {
+        String[] observeArguments = line.split(" ");
 
-      if (observeArguments.length > 1) {
-        int gameId = Integer.parseInt(observeArguments[1]);
+        if (observeArguments.length > 1) {
+          int gameId = Integer.parseInt(observeArguments[1]);
 
-        boolean observeSuccess = serverFacade.join(null, gameId);
+          boolean observeSuccess = serverFacade.join(null, gameId);
 
-        if (observeSuccess) {
-          System.out.print(EscapeSequences.ERASE_SCREEN);
+          if (observeSuccess) {
+            System.out.print(EscapeSequences.ERASE_SCREEN);
 
-          System.out.printf("Joined a game as an observer%n");
+            System.out.printf("Joined a game as an observer%n");
 
-          userInterface.observing = true;
+            userInterface.observing = true;
+          } else {
+            System.out.printf("There was an error joining a game as an observer%n");
+          }
         } else {
-          System.out.printf("There was an error joining a game as an observer%n");
+          System.out.printf("Not enough arguments provided for observe%n");
         }
-      } else {
-        System.out.printf("Not enough arguments provided for observe%n");
-      }
-    } else if (line.startsWith("logout")) {
-      loggedIn = false;
-    } else if (line.startsWith("help")) {
-      userInterface.printHelpPostLogin();
-    } else if (line.equals("quit")) {
-      quit = true;
+      } else if (line.startsWith("logout")) {
+        loggedIn = false;
+      } else if (line.startsWith("help")) {
+        userInterface.printHelpPostLogin();
+      } else if (line.equals("quit")) {
+        quit = true;
 
-      return;
+        return;
+      }
+    } catch (Exception e) {
+      System.out.println(e);
     }
 
     System.out.println();
@@ -241,7 +245,6 @@ public class Main {
   public static void game() {
     if (redraw) {
       userInterface.drawChessBoards();
-      System.out.println();
 
       redraw = false;
     }
@@ -260,7 +263,23 @@ public class Main {
 
       inGame = false;
     } else if (line.startsWith("moves")) {
+      String[] moveArguments = line.split(" ");
 
+      if (moveArguments.length > 1) {
+        String startPositionString = moveArguments[1].substring(0, 2);
+
+        try {
+          ChessPosition startPosition = parsePosition(startPositionString);
+
+          if (!userInterface.highlightLegalMoves(startPosition)) {
+            System.out.println("Invalid position");
+          }
+        } catch (IllegalArgumentException e) {
+          System.out.println(e);
+        }
+      } else {
+        System.out.println("Not enough arguments provided for moves");
+      }
     } else if (line.startsWith("move")) {
       String[] moveArguments = line.split(" ");
 

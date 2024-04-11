@@ -64,9 +64,14 @@ public class ChessGame {
    */
   public Collection<ChessMove> validMoves(ChessPosition startPosition) {
     var piece = board.getPiece(startPosition);
+    var validMoves = new HashSet<ChessMove>();
+
+    if (piece == null) {
+      return validMoves;
+    }
+
     var teamColor = piece.getTeamColor();
     var potentialMoves = piece.pieceMoves(this.board, startPosition);
-    var validMoves = new HashSet<ChessMove>();
 
     // filter moves that leave the king in danger
     for (ChessMove move : potentialMoves) {

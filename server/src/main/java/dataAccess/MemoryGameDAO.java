@@ -66,10 +66,23 @@ public class MemoryGameDAO implements GameDAO {
   }
 
   public void leaveGame(int gameID, String username) throws GameException {
-    GameData gameNotNull = findGame(gameID).orElseThrow(() -> new GameBadGameIDException("User attempted to make a move in a nonexistent game"));
-    ChessGame chessGame = gameNotNull.game;
+    GameData game = findGame(gameID).orElseThrow(() -> new GameBadGameIDException("User attempted to leave a nonexistent game"));
 
-    // todo: leave game for memory...
+    if (!username.equals(game.whiteUsername) && !username.equals(game.blackUsername)) {
+      throw new RuntimeException("Username is not part of this game");
+    }
+
+    if (username.equals(game.whiteUsername) && username.equals(game.blackUsername)) {
+      throw new RuntimeException("User attempted to join a game with their previous zombie user");
+    }
+
+    if (username.equals(game.whiteUsername)) {
+      game.whiteUsername = null;
+    }
+
+    if (username.equals(game.blackUsername)) {
+      game.blackUsername = null;
+    }
   }
 
   public void clear() {

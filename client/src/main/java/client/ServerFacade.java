@@ -11,6 +11,7 @@ import model.*;
 import ui.UserInterface;
 import webSocketMessages.serverMessages.ErrorMessage;
 import webSocketMessages.serverMessages.LoadGameMessage;
+import webSocketMessages.serverMessages.NotificationMessage;
 import webSocketMessages.serverMessages.ServerMessage;
 import webSocketMessages.userCommands.*;
 
@@ -63,8 +64,6 @@ public class ServerFacade extends Endpoint {
   }
 
   public void onMessageFacade(String message) {
-    System.out.println(message);
-
     try {
       ServerMessage serverMessage = gson.fromJson(message, ServerMessage.class);
 
@@ -76,8 +75,6 @@ public class ServerFacade extends Endpoint {
           this.gameID = gameData.gameID;
 
           userInterface.setGameData(gameData);
-
-          System.out.println("LOAD_GAME");
 
           synchronized (receivedGameLock) {
             this.receivedGame = true;
@@ -95,8 +92,9 @@ public class ServerFacade extends Endpoint {
           break;
         }
         case NOTIFICATION: {
-          // todo: debug del me
-          System.out.println("NOTIFICATION");
+          NotificationMessage notificationMessage = gson.fromJson(message, NotificationMessage.class);
+
+          System.out.println(notificationMessage.message);
 
           break;
         }
