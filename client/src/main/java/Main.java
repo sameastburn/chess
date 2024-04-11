@@ -12,6 +12,7 @@ public class Main {
   static boolean loggedIn = false;
   static boolean quit = false;
   static boolean inGame = false;
+  static boolean redraw = false;
 
   public static void main(String[] args) {
     userInterface = UserInterface.getInstance();
@@ -163,6 +164,7 @@ public class Main {
           System.out.printf("Joined a game%n");
 
           inGame = true;
+          redraw = true;
         } else {
           System.out.printf("There was an error joining a game%n");
         }
@@ -203,9 +205,12 @@ public class Main {
   }
 
   public static void game() {
-    userInterface.drawBothChessBoards();
+    if (redraw) {
+      userInterface.drawBothChessBoards();
+      System.out.printf("%n");
 
-    System.out.printf("%n");
+      redraw = false;
+    }
 
     System.out.print("[IN_GAME] >>> ");
 
@@ -214,6 +219,8 @@ public class Main {
 
     if (line.startsWith("help")) {
       userInterface.printHelpInGame();
+    } else if (line.startsWith("redraw")) {
+      redraw = true;
     }
 
     System.out.printf("%n");

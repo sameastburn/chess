@@ -102,13 +102,14 @@ public class UserInterface {
     System.out.print(EscapeSequences.RESET_BG_COLOR);
     System.out.println();
   }
+
   public void drawBothChessBoards() {
     ChessBoard exampleBoard = new ChessBoard();
     exampleBoard.resetBoard();
 
     drawChessBoard(exampleBoard, ChessGame.TeamColor.BLACK);
 
-    System.out.println("");
+    System.out.println();
 
     drawChessBoard(exampleBoard, ChessGame.TeamColor.WHITE);
   }
