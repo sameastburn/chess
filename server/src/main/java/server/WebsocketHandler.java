@@ -67,6 +67,20 @@ public class WebsocketHandler {
     resignedGames.clear();
   }
 
+  public void runCheckTests(ChessGame game, String username, int gameID) throws IOException {
+    if (game.isInCheck(ChessGame.TeamColor.BLACK)) {
+      sendNotification(username, gameID, "Black is in check");
+    }
+
+    if (game.isInCheckmate(ChessGame.TeamColor.WHITE)) {
+      sendNotification(username, gameID, "White is in checkmate");
+    }
+
+    if (game.isInCheckmate(ChessGame.TeamColor.BLACK )) {
+      sendNotification(username, gameID, "Black is in checkmate");
+    }
+  }
+
   @OnWebSocketMessage
   public void onMessage(Session session, String message) throws Exception {
     try {
@@ -151,21 +165,7 @@ public class WebsocketHandler {
 
           sendNotification(username, gameID, username + " made a move");
 
-          if (updatedGame.game.isInCheck(ChessGame.TeamColor.WHITE)) {
-            sendNotification(username, gameID, "White is in check");
-          }
-
-          if (updatedGame.game.isInCheck(ChessGame.TeamColor.BLACK)) {
-            sendNotification(username, gameID, "Black is in check");
-          }
-
-          if (updatedGame.game.isInCheckmate(ChessGame.TeamColor.WHITE)) {
-            sendNotification(username, gameID, "White is in checkmate");
-          }
-
-          if (updatedGame.game.isInCheckmate(ChessGame.TeamColor.BLACK )) {
-            sendNotification(username, gameID, "Black is in checkmate");
-          }
+          runCheckTests(updatedGame.game, username, gameID);
 
           break;
         } case RESIGN: {

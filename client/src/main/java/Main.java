@@ -114,6 +114,22 @@ public class Main {
 
   }
 
+  public synchronized static void waitTilReceivedGame() {
+    while (!serverFacade.receivedGame) {
+      synchronized (serverFacade.receivedGameLock) {
+        try {
+          while (!serverFacade.receivedGame) {
+            serverFacade.receivedGameLock.wait();
+          }
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+
+          System.out.println(e);
+        }
+      }
+    }
+  }
+
   public static void postLogin() {
     System.out.print("[LOGGED_IN] >>> ");
 
@@ -166,25 +182,9 @@ public class Main {
             userInterface.observing = false;
             inGame = true;
 
-            while (!serverFacade.receivedGame) {
-              synchronized (serverFacade.receivedGameLock) {
-                try {
-                  while (!serverFacade.receivedGame) {
-                    serverFacade.receivedGameLock.wait();
-                  }
-                } catch (InterruptedException e) {
-                  Thread.currentThread().interrupt();
+            waitTilReceivedGame();
 
-                  System.out.println(e);
-                }
-              }
-            }
-
-            System.out.print(EscapeSequences.ERASE_SCREEN);
-
-            System.out.printf("Joined a game%n");
-
-            // redraw = true;
+            System.out.print(EscapeSequences.ERASE_SCREEN + "Joined a game%n");
           } else {
             System.out.printf("There was an error joining a game%n");
           }
