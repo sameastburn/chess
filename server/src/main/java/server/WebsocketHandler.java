@@ -96,9 +96,11 @@ public class WebsocketHandler {
           Integer gameID = joinCommand.gameID;
           ChessGame.TeamColor playerColor = joinCommand.playerColor;
 
-          connectionManager.add(username, session, gameID);
-
           GameData gameNotNull = gameService.findGame(gameID).orElseThrow(() -> new GameBadGameIDException("User attempted to join a nonexistent game"));
+
+          if (gameNotNull.whiteUsername == null && gameNotNull.blackUsername == null) {
+            throw new RuntimeException("Trying to join game before HTTP request!");
+          }
 
           if (playerColor == ChessGame.TeamColor.WHITE) {
             if (gameNotNull.whiteUsername != null && !gameNotNull.whiteUsername.equals(username)) {
@@ -109,6 +111,8 @@ public class WebsocketHandler {
               throw new RuntimeException("Black spot already taken!");
             }
           }
+
+          connectionManager.add(username, session, gameID);
 
           sendLoadGame(session, gameNotNull);
           sendNotification(username, gameNotNull.gameID, username + " joined game '" + joinCommand.gameID + "' as '" + playerColor + "'");

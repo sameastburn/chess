@@ -184,7 +184,7 @@ public class Main {
 
             waitTilReceivedGame();
 
-            System.out.print(EscapeSequences.ERASE_SCREEN + "Joined a game%n");
+            System.out.println(EscapeSequences.ERASE_SCREEN + "Joined a game");
           } else {
             System.out.printf("There was an error joining a game%n");
           }
