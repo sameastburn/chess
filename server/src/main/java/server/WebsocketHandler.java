@@ -49,6 +49,7 @@ public class WebsocketHandler {
           JoinPlayerCommand joinCommand = gson.fromJson(message, JoinPlayerCommand.class);
           String authString = joinCommand.getAuthString();
 
+          // TODO: remove me, debug!
           System.out.println("JOIN_PLAYER");
 
           userService.authorize(authString);
