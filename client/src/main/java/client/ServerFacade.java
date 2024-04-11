@@ -7,13 +7,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import exception.ResponseException;
 import model.*;
+import webSocketMessages.serverMessages.ServerMessage;
 import webSocketMessages.userCommands.JoinPlayerCommand;
 import webSocketMessages.userCommands.UserGameCommand;
 
-import javax.websocket.ContainerProvider;
-import javax.websocket.MessageHandler;
-import javax.websocket.Session;
-import javax.websocket.WebSocketContainer;
+import javax.websocket.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -22,8 +20,6 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
-
-import javax.websocket.*;
 
 public class ServerFacade extends Endpoint {
   private static final ServerFacade instance = new ServerFacade();
@@ -61,6 +57,33 @@ public class ServerFacade extends Endpoint {
 
   public void onMessageFacade(String message) {
     System.out.println(message);
+
+    try {
+      ServerMessage serverMessage = gson.fromJson(message, ServerMessage.class);
+
+      switch (serverMessage.getServerMessageType()) {
+        case LOAD_GAME: {
+          // todo: debug del me
+          System.out.println("LOAD_GAME");
+
+          break;
+        }
+        case ERROR: {
+          // todo: debug del me
+          System.out.println("ERROR");
+
+          break;
+        }
+        case NOTIFICATION: {
+          // todo: debug del me
+          System.out.println("NOTIFICATION");
+
+          break;
+        }
+      }
+    } catch (Exception e) {
+      System.out.println(e);
+    }
   }
 
   public boolean connect() {

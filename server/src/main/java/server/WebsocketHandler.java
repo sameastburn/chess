@@ -94,11 +94,11 @@ public class WebsocketHandler {
           GameData gameNotNull = gameService.findGame(gameID).orElseThrow(() -> new GameBadGameIDException("User attempted to join a nonexistent game"));
 
           if (playerColor == ChessGame.TeamColor.WHITE) {
-            if (!gameNotNull.whiteUsername.equals(username)) {
+            if (gameNotNull.whiteUsername != null && !gameNotNull.whiteUsername.equals(username)) {
               throw new RuntimeException("White spot already taken!");
             }
           } else if (playerColor == ChessGame.TeamColor.BLACK) {
-            if (!gameNotNull.blackUsername.equals(username)) {
+            if (gameNotNull.blackUsername != null && !gameNotNull.blackUsername.equals(username)) {
               throw new RuntimeException("Black spot already taken!");
             }
           }
