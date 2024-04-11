@@ -17,6 +17,8 @@ public class UserInterface {
   private static final EnumMap<ChessPiece.PieceType, String> blackPiecesToUnicode = new EnumMap<>(ChessPiece.PieceType.class);
   // somehow making this static fixes weird race condition errors? ok
   public static volatile GameData gameData;
+  public static ChessGame.TeamColor myTeamColor;
+  public static boolean observing = false;
 
   static {
     whitePiecesToUnicode.put(ChessPiece.PieceType.KING, EscapeSequences.WHITE_KING);
@@ -51,7 +53,7 @@ public class UserInterface {
   public synchronized void setGameData(GameData gameDataArg) {
     gameData = gameDataArg;
 
-    drawBothChessBoards(gameData);
+    drawChessBoards();
   }
 
   public synchronized GameData getGameData() {
@@ -116,12 +118,16 @@ public class UserInterface {
     System.out.println();
   }
 
-  public void drawBothChessBoards(GameData theDataPleaseNoRaceCondition) {
-    drawChessBoard(theDataPleaseNoRaceCondition.game.getBoard(), ChessGame.TeamColor.BLACK);
+  public void drawChessBoards() {
+    if (observing) {
+      drawChessBoard(gameData.game.getBoard(), ChessGame.TeamColor.BLACK);
 
-    System.out.println();
+      System.out.println();
 
-    drawChessBoard(gameData.game.getBoard(), ChessGame.TeamColor.WHITE);
+      drawChessBoard(gameData.game.getBoard(), ChessGame.TeamColor.WHITE);
+    } else {
+      drawChessBoard(gameData.game.getBoard(), myTeamColor);
+    }
   }
 
   public void printHelpInGame() {

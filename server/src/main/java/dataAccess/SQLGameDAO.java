@@ -168,7 +168,9 @@ public class SQLGameDAO implements GameDAO {
     GameData gameNotNull = findGame(gameID).orElseThrow(() -> new GameBadGameIDException("User attempted to leave a nonexistent game"));
 
     String sql;
-    if (username.equals(gameNotNull.whiteUsername)) {
+    if (username.equals(gameNotNull.whiteUsername) && (username.equals(gameNotNull.blackUsername))) {
+      throw new RuntimeException("User attempted to join a game with their previous zombie user");
+    } else if (username.equals(gameNotNull.whiteUsername)) {
       sql = "UPDATE games SET whiteUsername = NULL WHERE gameID = ?";
     } else if (username.equals(gameNotNull.blackUsername)) {
       sql = "UPDATE games SET blackUsername = NULL WHERE gameID = ?";

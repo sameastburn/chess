@@ -1,6 +1,7 @@
 package client;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -8,11 +9,10 @@ import com.google.gson.reflect.TypeToken;
 import exception.ResponseException;
 import model.*;
 import ui.UserInterface;
+import webSocketMessages.serverMessages.ErrorMessage;
 import webSocketMessages.serverMessages.LoadGameMessage;
 import webSocketMessages.serverMessages.ServerMessage;
-import webSocketMessages.userCommands.JoinPlayerCommand;
-import webSocketMessages.userCommands.LeaveCommand;
-import webSocketMessages.userCommands.UserGameCommand;
+import webSocketMessages.userCommands.*;
 
 import javax.websocket.*;
 import java.io.IOException;
@@ -88,8 +88,9 @@ public class ServerFacade extends Endpoint {
           break;
         }
         case ERROR: {
-          // todo: debug del me
-          System.out.println("ERROR");
+          ErrorMessage errorMessage = gson.fromJson(message, ErrorMessage.class);
+
+          System.out.println(errorMessage.errorMessage);
 
           break;
         }
@@ -151,6 +152,21 @@ public class ServerFacade extends Endpoint {
     leaveCommand.gameID = gameID;
 
     send(leaveCommand);
+  }
+
+  public void resign() {
+    ResignCommand resignCommand = new ResignCommand(authToken);
+    resignCommand.gameID = gameID;
+
+    send(resignCommand);
+  }
+
+  public void move(ChessMove newMove) {
+    MakeMoveCommand moveCommand = new MakeMoveCommand(authToken);
+    moveCommand.gameID = gameID;
+    moveCommand.move = newMove;
+
+    send(moveCommand);
   }
 
   public void setPort(Integer port) {

@@ -1,4 +1,6 @@
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
 import client.ServerFacade;
 import ui.EscapeSequences;
 import ui.UserInterface;
@@ -108,9 +110,8 @@ public class Main {
       return;
     }
 
-    System.out.printf("%n");
+    System.out.println();
 
-    return;
   }
 
   public static void postLogin() {
@@ -153,12 +154,16 @@ public class Main {
       if (joinArguments.length > 2) {
         int gameId = Integer.parseInt(joinArguments[1]);
         String playerColor = joinArguments[2];
-        ChessGame.TeamColor colorAsEnum = playerColor.toLowerCase() == "white" ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+        ChessGame.TeamColor colorAsEnum = playerColor.toLowerCase().equals("white") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
 
         boolean joinSuccess = serverFacade.join(playerColor, gameId);
 
         if (joinSuccess) {
           serverFacade.joinGame(gameId, colorAsEnum);
+
+          userInterface.myTeamColor = colorAsEnum;
+          userInterface.observing = false;
+          inGame = true;
 
           while (!serverFacade.receivedGame) {
             synchronized (serverFacade.receivedGameLock) {
@@ -178,7 +183,6 @@ public class Main {
 
           System.out.printf("Joined a game%n");
 
-          inGame = true;
           // redraw = true;
         } else {
           System.out.printf("There was an error joining a game%n");
@@ -199,7 +203,7 @@ public class Main {
 
           System.out.printf("Joined a game as an observer%n");
 
-          // userInterface.drawBothChessBoards();
+          userInterface.observing = true;
         } else {
           System.out.printf("There was an error joining a game as an observer%n");
         }
@@ -219,9 +223,24 @@ public class Main {
     System.out.println();
   }
 
+  private static ChessPosition parsePosition(String position) {
+    if (position.length() != 2) {
+      throw new IllegalArgumentException("Invalid position format");
+    }
+
+    int col = position.toLowerCase().charAt(0) - 'a' + 1;
+    int row = Character.getNumericValue(position.charAt(1));
+
+    if (row < 1 || row > 8 || col < 1 || col > 8) {
+      throw new IllegalArgumentException("Position out of bounds");
+    }
+
+    return new ChessPosition(row, col);
+  }
+
   public static void game() {
     if (redraw) {
-      userInterface.drawBothChessBoards(userInterface.gameData);
+      userInterface.drawChessBoards();
       System.out.println();
 
       redraw = false;
@@ -240,8 +259,33 @@ public class Main {
       serverFacade.leave();
 
       inGame = false;
-    }
+    } else if (line.startsWith("moves")) {
 
-    System.out.println();
+    } else if (line.startsWith("move")) {
+      String[] moveArguments = line.split(" ");
+
+      if (moveArguments.length > 1) {
+        if (moveArguments[1].length() == 4) {
+          String startPositionString = moveArguments[1].substring(0, 2);
+          String endPositionString = moveArguments[1].substring(2, 4);
+
+          try {
+            ChessPosition startPosition = parsePosition(startPositionString);
+            ChessPosition endPosition = parsePosition(endPositionString);
+            ChessMove newMove = new ChessMove(startPosition, endPosition, null);
+
+            serverFacade.move(newMove);
+          } catch (IllegalArgumentException e) {
+            System.out.println(e);
+          }
+        } else {
+          System.out.println("Move positions were an invalid length");
+        }
+      } else {
+        System.out.println("Not enough arguments provided for move");
+      }
+    } else if (line.startsWith("resign")) {
+      serverFacade.resign();
+    }
   }
 }

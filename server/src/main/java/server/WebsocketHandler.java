@@ -104,7 +104,7 @@ public class WebsocketHandler {
           }
 
           sendLoadGame(session, gameNotNull);
-          sendNotification(username, gameNotNull.gameID, username + "joined game '" + joinCommand.gameID + "' as '" + playerColor + "'");
+          sendNotification(username, gameNotNull.gameID, username + " joined game '" + joinCommand.gameID + "' as '" + playerColor + "'");
 
           break;
         }
@@ -148,18 +148,19 @@ public class WebsocketHandler {
           // check if the player is trying to move for opponent
           // this could probably be abstracted into gameService but this is the solution for now
           if (pieceColor == ChessGame.TeamColor.WHITE) {
-            if (!gameNotNull.whiteUsername.equals(username)) {
+            if (gameNotNull.whiteUsername != null && !gameNotNull.whiteUsername.equals(username)) {
               throw new RuntimeException("Player with black pieces tried to move for opponent!");
             }
           } else if (pieceColor == ChessGame.TeamColor.BLACK) {
-            if (!gameNotNull.blackUsername.equals(username)) {
+            if (gameNotNull.blackUsername != null && !gameNotNull.blackUsername.equals(username)) {
               throw new RuntimeException("Player with white pieces tried to move for opponent!");
             }
           }
 
           gameService.makeMove(gameID, moveCommand.move);
 
-          broadcastLoadGame(gameNotNull);
+          GameData updatedGame = gameService.findGame(gameID).orElseThrow(() -> new GameBadGameIDException("User attempted to make a move on a nonexistent game"));
+          broadcastLoadGame(updatedGame);
 
           sendNotification(username, gameID, username + " made a move");
 
