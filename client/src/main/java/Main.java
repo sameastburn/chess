@@ -1,6 +1,8 @@
+import chess.ChessGame;
 import client.ServerFacade;
 import ui.EscapeSequences;
 import ui.UserInterface;
+import webSocketMessages.userCommands.JoinPlayerCommand;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
@@ -30,8 +32,6 @@ public class Main {
     System.out.print(EscapeSequences.ERASE_SCREEN);
 
     userInterface.printWelcomeHeader();
-
-    serverFacade.send("hey i'm here");
 
     while (!quit) {
       if (loggedIn) {
@@ -155,6 +155,9 @@ public class Main {
       if (joinArguments.length > 2) {
         int gameId = Integer.parseInt(joinArguments[1]);
         String playerColor = joinArguments[2];
+        ChessGame.TeamColor colorAsEnum = playerColor.toLowerCase() == "white" ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+
+        serverFacade.joinGame(gameId, colorAsEnum);
 
         boolean joinSuccess = serverFacade.join(playerColor, gameId);
 

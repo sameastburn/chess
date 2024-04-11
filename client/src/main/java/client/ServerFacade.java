@@ -1,11 +1,14 @@
 package client;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import exception.ResponseException;
 import model.*;
+import webSocketMessages.userCommands.JoinPlayerCommand;
+import webSocketMessages.userCommands.UserGameCommand;
 
 import javax.websocket.ContainerProvider;
 import javax.websocket.MessageHandler;
@@ -24,6 +27,7 @@ import javax.websocket.*;
 
 public class ServerFacade extends Endpoint {
   private static final ServerFacade instance = new ServerFacade();
+  private static final Gson gson = new Gson();
   private String authToken = "";
   private Integer port = 0;
   private Session session;
@@ -55,15 +59,20 @@ public class ServerFacade extends Endpoint {
     return response;
   }
 
+  public void onMessageFacade(String message) {
+    System.out.println(message);
+  }
+
   public boolean connect() {
     try {
       URI uri = new URI("ws://localhost:8080/connect");
       WebSocketContainer container = ContainerProvider.getWebSocketContainer();
       this.session = container.connectToServer(this, uri);
 
+      //MessageHandler is not a functional interface :(
       this.session.addMessageHandler(new MessageHandler.Whole<String>() {
         public void onMessage(String message) {
-          System.out.println(message);
+          onMessageFacade(message);
         }
       });
 
@@ -75,9 +84,9 @@ public class ServerFacade extends Endpoint {
     }
   }
 
-  public boolean send(String message) {
+  public boolean send(UserGameCommand command) {
     try {
-      this.session.getBasicRemote().sendText(message);
+      this.session.getBasicRemote().sendText(gson.toJson(command));
 
       return true;
     } catch (Exception e) {
@@ -85,6 +94,14 @@ public class ServerFacade extends Endpoint {
 
       return false;
     }
+  }
+
+  public void joinGame(Integer gameID, ChessGame.TeamColor playerColor) {
+    JoinPlayerCommand joinCommand = new JoinPlayerCommand(authToken);
+    joinCommand.gameID = gameID;
+    joinCommand.playerColor = playerColor;
+
+    send(joinCommand);
   }
 
   public void setPort(Integer port) {
