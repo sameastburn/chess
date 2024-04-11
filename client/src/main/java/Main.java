@@ -157,11 +157,11 @@ public class Main {
         String playerColor = joinArguments[2];
         ChessGame.TeamColor colorAsEnum = playerColor.toLowerCase() == "white" ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
 
-        serverFacade.joinGame(gameId, colorAsEnum);
-
         boolean joinSuccess = serverFacade.join(playerColor, gameId);
 
         if (joinSuccess) {
+          serverFacade.joinGame(gameId, colorAsEnum);
+
           System.out.print(EscapeSequences.ERASE_SCREEN);
 
           System.out.printf("Joined a game%n");

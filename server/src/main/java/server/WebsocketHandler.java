@@ -1,5 +1,6 @@
 package server;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import dataAccessExceptions.GameBadGameIDException;
 import model.GameData;
@@ -8,12 +9,15 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import service.GameService;
 import service.UserService;
+import webSocketMessages.serverMessages.ErrorMessage;
 import webSocketMessages.serverMessages.LoadGameMessage;
 import webSocketMessages.serverMessages.NotificationMessage;
 import webSocketMessages.userCommands.JoinPlayerCommand;
 import webSocketMessages.userCommands.UserGameCommand;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 @WebSocket
 public class WebsocketHandler {
@@ -36,8 +40,16 @@ public class WebsocketHandler {
     connectionManager.broadcast(selfUsername, notificationMessage);
   }
 
+  public void sendError(Session session, String message) throws IOException {
+    ErrorMessage errorMessage = new ErrorMessage();
+    errorMessage.errorMessage = "Error: " + message;
+
+    session.getRemote().sendString(gson.toJson(errorMessage));
+  }
+
   @OnWebSocketMessage
   public void onMessage(Session session, String message) throws Exception {
+    // TODO: delete this debug stuff when done
     // System.out.printf("Received: %s\n", message);
     // session.getRemote().sendString("WebSocket response: " + message);
 
@@ -48,6 +60,7 @@ public class WebsocketHandler {
         case JOIN_PLAYER: {
           JoinPlayerCommand joinCommand = gson.fromJson(message, JoinPlayerCommand.class);
           String authString = joinCommand.getAuthString();
+          ChessGame.TeamColor playerColor = joinCommand.playerColor;
 
           // TODO: remove me, debug!
           System.out.println("JOIN_PLAYER");
@@ -59,12 +72,29 @@ public class WebsocketHandler {
 
           GameData gameNotNull = gameService.findGame(joinCommand.gameID).orElseThrow(() -> new GameBadGameIDException("User attempted to join a nonexistent game"));
 
+          if (playerColor == null) {
+            // TODO: actual observers?
+          } else if (playerColor == ChessGame.TeamColor.WHITE) {
+            if (!gameNotNull.whiteUsername.equals(username)) {
+              throw new RuntimeException("White spot already taken!");
+            }
+          } else if (playerColor == ChessGame.TeamColor.BLACK) {
+            if (!gameNotNull.blackUsername.equals(username)) {
+              throw new RuntimeException("Black spot already taken!");
+            }
+          }
+
           sendLoadGame(session, gameNotNull);
           sendNotification(username, username + " joined game: " + joinCommand.gameID);
         }
       }
     } catch (Exception e) {
       System.out.println(e);
+
+      StringWriter sw = new StringWriter();
+      e.printStackTrace(new PrintWriter(sw));
+
+      sendError(session, sw.toString());
     }
   }
 }
