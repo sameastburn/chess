@@ -151,7 +151,6 @@ public class Main {
     } else if (line.startsWith("join")) {
       String[] joinArguments = line.split(" ");
 
-      // not sure why "<empty>" exists when we already have an observer command... maybe edit later?
       if (joinArguments.length > 2) {
         int gameId = Integer.parseInt(joinArguments[1]);
         String playerColor = joinArguments[2];
@@ -161,6 +160,20 @@ public class Main {
 
         if (joinSuccess) {
           serverFacade.joinGame(gameId, colorAsEnum);
+
+          while (!serverFacade.receivedGame) {
+            synchronized (serverFacade.receivedGameLock) {
+              try {
+                while (!serverFacade.receivedGame) {
+                  serverFacade.receivedGameLock.wait();
+                }
+              } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+
+                System.out.println(e);
+              }
+            }
+          }
 
           System.out.print(EscapeSequences.ERASE_SCREEN);
 

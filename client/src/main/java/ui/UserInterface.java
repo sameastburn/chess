@@ -4,6 +4,7 @@ import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
+import model.GameData;
 
 import java.io.PrintStream;
 import java.util.EnumMap;
@@ -14,6 +15,7 @@ public class UserInterface {
   private static final UserInterface instance = new UserInterface();
   private static final EnumMap<ChessPiece.PieceType, String> whitePiecesToUnicode = new EnumMap<>(ChessPiece.PieceType.class);
   private static final EnumMap<ChessPiece.PieceType, String> blackPiecesToUnicode = new EnumMap<>(ChessPiece.PieceType.class);
+  private volatile GameData gameData;
 
   static {
     whitePiecesToUnicode.put(ChessPiece.PieceType.KING, EscapeSequences.WHITE_KING);
@@ -45,6 +47,16 @@ public class UserInterface {
     out = outputStream;
   }
 
+  public synchronized void setGameData(GameData gameDataArg) {
+    gameData = gameDataArg;
+
+    System.out.println("gameData is now: " + gameData);
+  }
+
+  public synchronized GameData getGameData() {
+    return gameData;
+  }
+
   public void printWelcomeHeader() {
     out.printf(CROWN + "Welcome to 240 chess. Type Help to get started." + CROWN + "%n");
   }
@@ -59,7 +71,7 @@ public class UserInterface {
   public void printHelpPostLogin() {
     out.printf("\tcreate <NAME> - a game%n");
     out.printf("\tlist - games%n");
-    out.printf("\tjoin <ID> [WHITE|BLACK|<empty>] - a game%n");
+    out.printf("\tjoin <ID> [WHITE|BLACK] - a game%n");
     out.printf("\tobserve <ID> - a game%n");
     out.printf("\tlogout - when you are done%n");
     out.printf("\tquit - playing chess%n");
@@ -104,14 +116,15 @@ public class UserInterface {
   }
 
   public void drawBothChessBoards() {
-    ChessBoard exampleBoard = new ChessBoard();
-    exampleBoard.resetBoard();
+    System.out.println("gameDate is now in draw: " + gameData);
 
-    drawChessBoard(exampleBoard, ChessGame.TeamColor.BLACK);
+    GameData localGameData = getGameData();
+
+    drawChessBoard(localGameData.game.getBoard(), ChessGame.TeamColor.BLACK);
 
     System.out.println();
 
-    drawChessBoard(exampleBoard, ChessGame.TeamColor.WHITE);
+    drawChessBoard(gameData.game.getBoard(), ChessGame.TeamColor.WHITE);
   }
 
   public void printHelpInGame() {

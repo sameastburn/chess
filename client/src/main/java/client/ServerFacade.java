@@ -7,6 +7,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import exception.ResponseException;
 import model.*;
+import ui.UserInterface;
+import webSocketMessages.serverMessages.LoadGameMessage;
 import webSocketMessages.serverMessages.ServerMessage;
 import webSocketMessages.userCommands.JoinPlayerCommand;
 import webSocketMessages.userCommands.UserGameCommand;
@@ -23,10 +25,13 @@ import java.util.ArrayList;
 
 public class ServerFacade extends Endpoint {
   private static final ServerFacade instance = new ServerFacade();
+  private static final UserInterface userInterface = new UserInterface();
   private static final Gson gson = new Gson();
   private String authToken = "";
   private Integer port = 0;
   private Session session;
+  public volatile boolean receivedGame = false;
+  public final Object receivedGameLock = new Object();
 
   public static ServerFacade getInstance() {
     return instance;
@@ -63,8 +68,18 @@ public class ServerFacade extends Endpoint {
 
       switch (serverMessage.getServerMessageType()) {
         case LOAD_GAME: {
-          // todo: debug del me
+          LoadGameMessage loadGameMessage = gson.fromJson(message, LoadGameMessage.class);
+          GameData gameData = loadGameMessage.game;
+
+          userInterface.setGameData(gameData);
+
           System.out.println("LOAD_GAME");
+
+          synchronized (receivedGameLock) {
+            this.receivedGame = true;
+
+            receivedGameLock.notifyAll();
+          }
 
           break;
         }
