@@ -2,6 +2,7 @@ package server;
 
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.ChessPiece;
 import com.google.gson.Gson;
 import dataAccessExceptions.GameBadGameIDException;
 import model.GameData;
@@ -118,11 +119,31 @@ public class WebsocketHandler {
           System.out.println("MAKE_MOVE");
 
           MakeMoveCommand moveCommand = gson.fromJson(message, MakeMoveCommand.class);
-          gameService.makeMove(moveCommand.gameID, moveCommand.move);
+          GameData gameNotNull = gameService.findGame(moveCommand.gameID).orElseThrow(() -> new GameBadGameIDException("User attempted to make a move on a nonexistent game"));
 
           String username = userService.getUsernameFromToken(moveCommand.getAuthString());
 
-          GameData gameNotNull = gameService.findGame(moveCommand.gameID).orElseThrow(() -> new GameBadGameIDException("User attempted to make a move on a nonexistent game"));
+          ChessPiece piece = gameNotNull.game.getBoard().getPiece(moveCommand.move.getStartPosition());
+
+          if (piece == null) {
+            throw new RuntimeException("Early detection of an invalid move");
+          }
+
+          ChessGame.TeamColor pieceColor = piece.getTeamColor();
+
+          // check if the player is trying to move for opponent
+          // this could probably be abstracted into gameService but this is the solution for now
+          if (pieceColor == ChessGame.TeamColor.WHITE) {
+            if (!gameNotNull.whiteUsername.equals(username)) {
+              throw new RuntimeException("Player with black pieces tried to move for opponent!");
+            }
+          } else if (pieceColor == ChessGame.TeamColor.BLACK) {
+            if (!gameNotNull.blackUsername.equals(username)) {
+              throw new RuntimeException("Player with white pieces tried to move for opponent!");
+            }
+          }
+
+          gameService.makeMove(moveCommand.gameID, moveCommand.move);
 
           broadcastLoadGame(gameNotNull);
 
