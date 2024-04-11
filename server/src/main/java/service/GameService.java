@@ -1,5 +1,7 @@
 package service;
 
+import chess.ChessMove;
+import chess.InvalidMoveException;
 import dataAccess.GameDAO;
 import dataAccess.GameException;
 import dataAccess.SQLGameDAO;
@@ -35,5 +37,9 @@ public class GameService {
 
   public void joinGame(String username, JoinGameRequest joinGameRequest) throws GameException {
     gameDAO.joinGame(username, joinGameRequest);
+  }
+
+  public void makeMove(int gameID, ChessMove move) throws GameException, InvalidMoveException {
+    gameDAO.makeMove(gameID, move);
   }
 }

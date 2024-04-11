@@ -1,6 +1,8 @@
 package dataAccess;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.InvalidMoveException;
 import dataAccessExceptions.GameBadGameIDException;
 import dataAccessExceptions.GameColorTakenException;
 import model.GameData;
@@ -25,7 +27,11 @@ public class MemoryGameDAO implements GameDAO {
 
   public int createGame(String gameName) {
     int newGameID = games.size() + 1;
-    GameData newGame = new GameData(newGameID, null, null, gameName, new ChessGame());
+
+    ChessGame newChessGame = new ChessGame();
+    newChessGame.getBoard().resetBoard();
+
+    GameData newGame = new GameData(newGameID, null, null, gameName, newChessGame);
 
     games.add(newGame);
 
@@ -50,6 +56,13 @@ public class MemoryGameDAO implements GameDAO {
 
       gameNotNull.blackUsername = username;
     }
+  }
+
+  public void makeMove(int gameID, ChessMove move) throws GameException, InvalidMoveException {
+    GameData gameNotNull = findGame(gameID).orElseThrow(() -> new GameBadGameIDException("User attempted to make a move in a nonexistent game"));
+    ChessGame chessGame = gameNotNull.game;
+
+    chessGame.makeMove(move);
   }
 
   public void clear() {

@@ -11,8 +11,8 @@ import java.util.HashSet;
  * signature of the existing methods.
  */
 public class ChessGame {
-  private ChessBoard board;
-  private TeamColor turn;
+  private ChessBoard board = new ChessBoard();
+  private TeamColor turn = TeamColor.WHITE;
 
   public ChessGame() {
 

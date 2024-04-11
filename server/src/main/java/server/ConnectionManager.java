@@ -3,6 +3,7 @@ package server;
 import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.Session;
 import webSocketMessages.serverMessages.NotificationMessage;
+import webSocketMessages.serverMessages.ServerMessage;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,12 +22,12 @@ public class ConnectionManager {
     connections.remove(username);
   }
 
-  public void broadcast(String excludeUsername, NotificationMessage notification) throws IOException {
+  public void broadcast(String excludeUsername, ServerMessage message) throws IOException {
     var removeList = new ArrayList<Connection>();
     for (var c : connections.values()) {
       if (c.session.isOpen()) {
         if (!c.username.equals(excludeUsername)) {
-          c.send(gson.toJson(notification));
+          c.send(gson.toJson(message));
         }
       } else {
         removeList.add(c);

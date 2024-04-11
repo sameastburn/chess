@@ -1,6 +1,7 @@
 package server;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import com.google.gson.Gson;
 import dataAccessExceptions.GameBadGameIDException;
 import model.GameData;
@@ -14,6 +15,7 @@ import webSocketMessages.serverMessages.LoadGameMessage;
 import webSocketMessages.serverMessages.NotificationMessage;
 import webSocketMessages.userCommands.JoinObserverCommand;
 import webSocketMessages.userCommands.JoinPlayerCommand;
+import webSocketMessages.userCommands.MakeMoveCommand;
 import webSocketMessages.userCommands.UserGameCommand;
 
 import java.io.IOException;
@@ -32,6 +34,13 @@ public class WebsocketHandler {
     loadGameMessage.game = game;
 
     session.getRemote().sendString(gson.toJson(loadGameMessage));
+  }
+
+  public void broadcastLoadGame(GameData game) throws IOException {
+    LoadGameMessage loadGameMessage = new LoadGameMessage();
+    loadGameMessage.game = game;
+
+    connectionManager.broadcast("", loadGameMessage);
   }
 
   public void sendNotification(String excludedUser, String message) throws IOException {
@@ -56,24 +65,24 @@ public class WebsocketHandler {
 
     try {
       UserGameCommand gameCommand = gson.fromJson(message, UserGameCommand.class);
+      String authString = gameCommand.getAuthString();
+
+      userService.authorize(authString);
 
       switch (gameCommand.getCommandType()) {
         case JOIN_PLAYER: {
           JoinPlayerCommand joinCommand = gson.fromJson(message, JoinPlayerCommand.class);
-          String authString = joinCommand.getAuthString();
           ChessGame.TeamColor playerColor = joinCommand.playerColor;
 
           // TODO: remove me, debug!
           System.out.println("JOIN_PLAYER");
-
-          userService.authorize(authString);
 
           String username = userService.getUsernameFromToken(joinCommand.getAuthString());
           connectionManager.add(username, session);
 
           GameData gameNotNull = gameService.findGame(joinCommand.gameID).orElseThrow(() -> new GameBadGameIDException("User attempted to join a nonexistent game"));
 
-           if (playerColor == ChessGame.TeamColor.WHITE) {
+          if (playerColor == ChessGame.TeamColor.WHITE) {
             if (!gameNotNull.whiteUsername.equals(username)) {
               throw new RuntimeException("White spot already taken!");
             }
@@ -93,9 +102,6 @@ public class WebsocketHandler {
           System.out.println("JOIN_OBSERVER");
 
           JoinObserverCommand joinCommand = gson.fromJson(message, JoinObserverCommand.class);
-          String authString = joinCommand.getAuthString();
-
-          userService.authorize(authString);
 
           String username = userService.getUsernameFromToken(joinCommand.getAuthString());
           connectionManager.add(username, session);
@@ -106,6 +112,21 @@ public class WebsocketHandler {
           sendNotification(username, username + " is now observing game '" + joinCommand.gameID + "'");
 
           break;
+        }
+        case MAKE_MOVE: {
+          // TODO: remove me, debug!
+          System.out.println("MAKE_MOVE");
+
+          MakeMoveCommand moveCommand = gson.fromJson(message, MakeMoveCommand.class);
+          gameService.makeMove(moveCommand.gameID, moveCommand.move);
+
+          String username = userService.getUsernameFromToken(moveCommand.getAuthString());
+
+          GameData gameNotNull = gameService.findGame(moveCommand.gameID).orElseThrow(() -> new GameBadGameIDException("User attempted to make a move on a nonexistent game"));
+
+          broadcastLoadGame(gameNotNull);
+
+          sendNotification(username, username + " made a move");
         }
       }
     } catch (Exception e) {

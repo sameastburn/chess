@@ -1,6 +1,8 @@
 package dataAccess;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import dataAccessExceptions.DataAccessException;
 import dataAccessExceptions.GameBadGameIDException;
@@ -87,8 +89,11 @@ public class SQLGameDAO implements GameDAO {
       try (var preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
         preparedStatement.setString(1, gameName);
 
+        ChessGame newChessGame = new ChessGame();
+        newChessGame.getBoard().resetBoard();
+
         Gson gson = new Gson();
-        preparedStatement.setString(2, gson.toJson(new ChessGame()));
+        preparedStatement.setString(2, gson.toJson(newChessGame));
 
         preparedStatement.executeUpdate();
 
@@ -126,6 +131,32 @@ public class SQLGameDAO implements GameDAO {
 
         if (affectedRows == 0) {
           throw new GameColorTakenException("User attempted to join a game with a taken color");
+        }
+      }
+    } catch (SQLException | DataAccessException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public void makeMove(int gameID, ChessMove move) throws GameException, InvalidMoveException {
+    GameData gameNotNull = findGame(gameID).orElseThrow(() -> new GameBadGameIDException("User attempted to make a move in a nonexistent game"));
+    ChessGame chessGame = gameNotNull.game;
+
+    chessGame.makeMove(move);
+
+    Gson gson = new Gson();
+    String updatedGameState = gson.toJson(chessGame);
+
+    String sql = "UPDATE games SET gameState = ? WHERE gameID = ?";
+    try (var conn = DatabaseManager.getConnection()) {
+      try (var preparedStatement = conn.prepareStatement(sql)) {
+        preparedStatement.setString(1, updatedGameState);
+        preparedStatement.setInt(2, gameID);
+
+        int affectedRows = preparedStatement.executeUpdate();
+
+        if (affectedRows == 0) {
+          throw new DataAccessException("Updating game state failed, no rows affected");
         }
       }
     } catch (SQLException | DataAccessException e) {
