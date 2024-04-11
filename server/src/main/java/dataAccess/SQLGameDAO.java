@@ -119,7 +119,7 @@ public class SQLGameDAO implements GameDAO {
     }
 
     String sqlUpdate = "UPDATE games SET %s = ? WHERE gameID = ? AND %s IS NULL";
-    String columnToUpdate = joinGameRequest.playerColor().equals("WHITE") ? "whiteUsername" : "blackUsername";
+    String columnToUpdate = joinGameRequest.playerColor().toLowerCase().equals("white") ? "whiteUsername" : "blackUsername";
     String sql = String.format(sqlUpdate, columnToUpdate, columnToUpdate);
 
     try (var conn = DatabaseManager.getConnection()) {

@@ -2,7 +2,6 @@ import chess.ChessGame;
 import client.ServerFacade;
 import ui.EscapeSequences;
 import ui.UserInterface;
-import webSocketMessages.userCommands.JoinPlayerCommand;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
@@ -180,7 +179,7 @@ public class Main {
           System.out.printf("Joined a game%n");
 
           inGame = true;
-          redraw = true;
+          // redraw = true;
         } else {
           System.out.printf("There was an error joining a game%n");
         }
@@ -217,13 +216,13 @@ public class Main {
       return;
     }
 
-    System.out.printf("%n");
+    System.out.println();
   }
 
   public static void game() {
     if (redraw) {
-      // userInterface.drawBothChessBoards();
-      System.out.printf("%n");
+      userInterface.drawBothChessBoards(userInterface.gameData);
+      System.out.println();
 
       redraw = false;
     }
@@ -237,8 +236,12 @@ public class Main {
       userInterface.printHelpInGame();
     } else if (line.startsWith("redraw")) {
       redraw = true;
+    } else if (line.startsWith("leave")) {
+      serverFacade.leave();
+
+      inGame = false;
     }
 
-    System.out.printf("%n");
+    System.out.println();
   }
 }

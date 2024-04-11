@@ -11,6 +11,7 @@ import ui.UserInterface;
 import webSocketMessages.serverMessages.LoadGameMessage;
 import webSocketMessages.serverMessages.ServerMessage;
 import webSocketMessages.userCommands.JoinPlayerCommand;
+import webSocketMessages.userCommands.LeaveCommand;
 import webSocketMessages.userCommands.UserGameCommand;
 
 import javax.websocket.*;
@@ -30,6 +31,7 @@ public class ServerFacade extends Endpoint {
   private String authToken = "";
   private Integer port = 0;
   private Session session;
+  private Integer gameID = -1;
   public volatile boolean receivedGame = false;
   public final Object receivedGameLock = new Object();
 
@@ -70,6 +72,8 @@ public class ServerFacade extends Endpoint {
         case LOAD_GAME: {
           LoadGameMessage loadGameMessage = gson.fromJson(message, LoadGameMessage.class);
           GameData gameData = loadGameMessage.game;
+
+          this.gameID = gameData.gameID;
 
           userInterface.setGameData(gameData);
 
@@ -140,6 +144,13 @@ public class ServerFacade extends Endpoint {
     joinCommand.playerColor = playerColor;
 
     send(joinCommand);
+  }
+
+  public void leave() {
+    LeaveCommand leaveCommand = new LeaveCommand(authToken);
+    leaveCommand.gameID = gameID;
+
+    send(leaveCommand);
   }
 
   public void setPort(Integer port) {
