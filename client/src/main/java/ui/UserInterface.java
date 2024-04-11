@@ -51,6 +51,8 @@ public class UserInterface {
     gameData = gameDataArg;
 
     System.out.println("gameData is now: " + gameData);
+
+    drawBothChessBoards(gameData);
   }
 
   public synchronized GameData getGameData() {
@@ -115,12 +117,10 @@ public class UserInterface {
     System.out.println();
   }
 
-  public void drawBothChessBoards() {
+  public void drawBothChessBoards(GameData theDataPleaseNoRaceCondition) {
     System.out.println("gameDate is now in draw: " + gameData);
 
-    GameData localGameData = getGameData();
-
-    drawChessBoard(localGameData.game.getBoard(), ChessGame.TeamColor.BLACK);
+    drawChessBoard(theDataPleaseNoRaceCondition.game.getBoard(), ChessGame.TeamColor.BLACK);
 
     System.out.println();
 

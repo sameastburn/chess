@@ -200,7 +200,7 @@ public class Main {
 
           System.out.printf("Joined a game as an observer%n");
 
-          userInterface.drawBothChessBoards();
+          // userInterface.drawBothChessBoards();
         } else {
           System.out.printf("There was an error joining a game as an observer%n");
         }
@@ -222,7 +222,7 @@ public class Main {
 
   public static void game() {
     if (redraw) {
-      userInterface.drawBothChessBoards();
+      // userInterface.drawBothChessBoards();
       System.out.printf("%n");
 
       redraw = false;
