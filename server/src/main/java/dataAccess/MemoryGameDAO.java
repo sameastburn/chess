@@ -65,6 +65,13 @@ public class MemoryGameDAO implements GameDAO {
     chessGame.makeMove(move);
   }
 
+  public void leaveGame(int gameID, String username) throws GameException {
+    GameData gameNotNull = findGame(gameID).orElseThrow(() -> new GameBadGameIDException("User attempted to make a move in a nonexistent game"));
+    ChessGame chessGame = gameNotNull.game;
+
+    // todo: leave game for memory...
+  }
+
   public void clear() {
     games.clear();
   }

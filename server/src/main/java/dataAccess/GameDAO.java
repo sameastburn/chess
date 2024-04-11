@@ -14,5 +14,6 @@ public interface GameDAO {
   public int createGame(String gameName);
   public void joinGame(String username, JoinGameRequest joinGameRequest) throws GameException;
   public void makeMove(int gameID, ChessMove move) throws GameException, InvalidMoveException;
-  void clear();
+  public void leaveGame(int gameID, String username) throws GameException;
+  public void clear();
 }

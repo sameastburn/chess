@@ -13,8 +13,8 @@ public class ConnectionManager {
   public final ConcurrentHashMap<String, Connection> connections = new ConcurrentHashMap<>();
   private static final Gson gson = new Gson();
 
-  public void add(String username, Session session) {
-    var connection = new Connection(username, session);
+  public void add(String username, Session session, Integer gameID) {
+    var connection = new Connection(username, session, gameID);
     connections.put(username, connection);
   }
 
@@ -22,15 +22,17 @@ public class ConnectionManager {
     connections.remove(username);
   }
 
-  public void broadcast(String excludeUsername, ServerMessage message) throws IOException {
+  public void broadcast(String excludeUsername, int gameID, ServerMessage message) throws IOException {
     var removeList = new ArrayList<Connection>();
     for (var c : connections.values()) {
-      if (c.session.isOpen()) {
-        if (!c.username.equals(excludeUsername)) {
-          c.send(gson.toJson(message));
+      if (c.gameID != null && c.gameID.equals(gameID)) {
+        if (c.session.isOpen()) {
+          if (!c.username.equals(excludeUsername)) {
+            c.send(gson.toJson(message));
+          }
+        } else {
+          removeList.add(c);
         }
-      } else {
-        removeList.add(c);
       }
     }
 

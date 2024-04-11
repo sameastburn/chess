@@ -19,6 +19,7 @@ public class RouteHandler {
   private static final Gson gson = new Gson();
   private static final UserService userService = UserService.getInstance();
   private static final GameService gameService = GameService.getInstance();
+  private static final WebsocketHandler webSocketHandler = WebsocketHandler.getInstance();
 
   public static RouteHandler getInstance() {
     return instance;
@@ -27,6 +28,7 @@ public class RouteHandler {
   public Object db(Request request, Response response) {
     userService.clear();
     gameService.clear();
+    webSocketHandler.clearResignedGames();
 
     return new JsonObject();
   }

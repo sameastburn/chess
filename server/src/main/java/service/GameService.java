@@ -42,4 +42,8 @@ public class GameService {
   public void makeMove(int gameID, ChessMove move) throws GameException, InvalidMoveException {
     gameDAO.makeMove(gameID, move);
   }
+
+  public void leaveGame(int gameID, String username) throws GameException {
+    gameDAO.leaveGame(gameID, username);
+  }
 }

@@ -164,6 +164,32 @@ public class SQLGameDAO implements GameDAO {
     }
   }
 
+  public void leaveGame(int gameID, String username) throws GameException {
+    GameData gameNotNull = findGame(gameID).orElseThrow(() -> new GameBadGameIDException("User attempted to leave a nonexistent game"));
+
+    String sql;
+    if (username.equals(gameNotNull.whiteUsername)) {
+      sql = "UPDATE games SET whiteUsername = NULL WHERE gameID = ?";
+    } else if (username.equals(gameNotNull.blackUsername)) {
+      sql = "UPDATE games SET blackUsername = NULL WHERE gameID = ?";
+    } else {
+      throw new RuntimeException("Username is not part of this game");
+    }
+
+    try (var conn = DatabaseManager.getConnection()) {
+      try (var preparedStatement = conn.prepareStatement(sql)) {
+        preparedStatement.setInt(1, gameID);
+
+        int affectedRows = preparedStatement.executeUpdate();
+        if (affectedRows == 0) {
+          throw new RuntimeException("The player was not in the game or already removed");
+        }
+      }
+    } catch (SQLException | DataAccessException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   public void clear() {
     games.clear();
 

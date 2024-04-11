@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashSet;
+import java.util.Map;
 
 @WebSocket
 public class WebsocketHandler {
@@ -45,14 +46,14 @@ public class WebsocketHandler {
     LoadGameMessage loadGameMessage = new LoadGameMessage();
     loadGameMessage.game = game;
 
-    connectionManager.broadcast("", loadGameMessage);
+    connectionManager.broadcast("", game.gameID, loadGameMessage);
   }
 
-  public void sendNotification(String excludedUser, String message) throws IOException {
+  public void sendNotification(String excludedUser, int gameID, String message) throws IOException {
     NotificationMessage notificationMessage = new NotificationMessage();
     notificationMessage.message = message;
 
-    connectionManager.broadcast(excludedUser, notificationMessage);
+    connectionManager.broadcast(excludedUser, gameID, notificationMessage);
   }
 
   public void sendError(Session session, String message) throws IOException {
@@ -75,21 +76,22 @@ public class WebsocketHandler {
     try {
       UserGameCommand gameCommand = gson.fromJson(message, UserGameCommand.class);
       String authString = gameCommand.getAuthString();
+      String username = userService.getUsernameFromToken(gameCommand.getAuthString());
 
       userService.authorize(authString);
 
       switch (gameCommand.getCommandType()) {
         case JOIN_PLAYER: {
           JoinPlayerCommand joinCommand = gson.fromJson(message, JoinPlayerCommand.class);
+          Integer gameID = joinCommand.gameID;
           ChessGame.TeamColor playerColor = joinCommand.playerColor;
 
           // TODO: remove me, debug!
           System.out.println("JOIN_PLAYER");
 
-          String username = userService.getUsernameFromToken(joinCommand.getAuthString());
-          connectionManager.add(username, session);
+          connectionManager.add(username, session, gameID);
 
-          GameData gameNotNull = gameService.findGame(joinCommand.gameID).orElseThrow(() -> new GameBadGameIDException("User attempted to join a nonexistent game"));
+          GameData gameNotNull = gameService.findGame(gameID).orElseThrow(() -> new GameBadGameIDException("User attempted to join a nonexistent game"));
 
           if (playerColor == ChessGame.TeamColor.WHITE) {
             if (!gameNotNull.whiteUsername.equals(username)) {
@@ -102,7 +104,7 @@ public class WebsocketHandler {
           }
 
           sendLoadGame(session, gameNotNull);
-          sendNotification(username, username + "joined game '" + joinCommand.gameID + "' as '" + playerColor + "'");
+          sendNotification(username, gameNotNull.gameID, username + "joined game '" + joinCommand.gameID + "' as '" + playerColor + "'");
 
           break;
         }
@@ -111,14 +113,14 @@ public class WebsocketHandler {
           System.out.println("JOIN_OBSERVER");
 
           JoinObserverCommand joinCommand = gson.fromJson(message, JoinObserverCommand.class);
+          Integer gameID = joinCommand.gameID;
 
-          String username = userService.getUsernameFromToken(joinCommand.getAuthString());
-          connectionManager.add(username, session);
+          connectionManager.add(username, session, gameID);
 
           GameData gameNotNull = gameService.findGame(joinCommand.gameID).orElseThrow(() -> new GameBadGameIDException("User attempted to join a nonexistent game"));
 
           sendLoadGame(session, gameNotNull);
-          sendNotification(username, username + " is now observing game '" + joinCommand.gameID + "'");
+          sendNotification(username, gameID, username + " is now observing game '" + joinCommand.gameID + "'");
 
           break;
         }
@@ -132,10 +134,8 @@ public class WebsocketHandler {
           GameData gameNotNull = gameService.findGame(gameID).orElseThrow(() -> new GameBadGameIDException("User attempted to make a move on a nonexistent game"));
 
           if (resignedGames.contains(gameID)) {
-            throw new RuntimeException("Attempted to make a move in a game with a forfeit");
+            throw new RuntimeException("Attempted to make a move in a game with a resignation");
           }
-
-          String username = userService.getUsernameFromToken(moveCommand.getAuthString());
 
           ChessPiece piece = gameNotNull.game.getBoard().getPiece(moveCommand.move.getStartPosition());
 
@@ -161,14 +161,12 @@ public class WebsocketHandler {
 
           broadcastLoadGame(gameNotNull);
 
-          sendNotification(username, username + " made a move");
+          sendNotification(username, gameID, username + " made a move");
 
           break;
         } case RESIGN: {
           ResignCommand resignCommand = gson.fromJson(message, ResignCommand.class);
           int gameID = resignCommand.gameID;
-
-          String username = userService.getUsernameFromToken(resignCommand.getAuthString());
 
           GameData gameNotNull = gameService.findGame(resignCommand.gameID).orElseThrow(() -> new GameBadGameIDException("User attempted to make a move on a nonexistent game"));
           if (!(gameNotNull.whiteUsername.equals(username) || gameNotNull.blackUsername.equals(username))) {
@@ -179,9 +177,23 @@ public class WebsocketHandler {
             throw new RuntimeException("Player tried to resign in a game that was already finished");
           }
 
-          sendNotification("", username + " resigned");
+          sendNotification("", gameID, username + " resigned");
 
           resignedGames.add(gameID);
+
+          break;
+        } case LEAVE: {
+          LeaveCommand leaveCommand = gson.fromJson(message, LeaveCommand.class);
+
+          connectionManager.remove(username);
+
+          sendNotification(username, leaveCommand.gameID,username + " left the game");
+
+          try {
+            gameService.leaveGame(leaveCommand.gameID, username);
+          } catch (Exception e) {
+            // this might throw because of the observer...
+          }
 
           break;
         }
