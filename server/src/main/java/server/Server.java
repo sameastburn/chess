@@ -18,8 +18,6 @@ public class Server {
     Service http = ignite();
 
     http.port(desiredPort);
-
-    http.port(8080);
     http.webSocket("/connect", WebsocketHandler.class);
 
     http.staticFiles.location("web");

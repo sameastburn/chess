@@ -11,13 +11,14 @@ public class Main {
   static ServerFacade serverFacade;
   static boolean loggedIn = false;
   static boolean quit = false;
+  static boolean inGame = false;
 
   public static void main(String[] args) {
     userInterface = UserInterface.getInstance();
     userInterface.init(new PrintStream(System.out, true, StandardCharsets.UTF_8));
 
     serverFacade = ServerFacade.getInstance();
-    serverFacade.setPort(1234);
+    serverFacade.setPort(8080);
 
     if (!serverFacade.connect()) {
       System.out.print("There was an error connecting to the server!");
@@ -33,16 +34,20 @@ public class Main {
 
     while (!quit) {
       if (loggedIn) {
-        postLogin();
+        if (inGame) {
+          game();
+        } else {
+          postLogin();
+        }
       } else {
         preLogin();
       }
     }
   }
 
-  public static boolean preLogin() {
+  public static void preLogin() {
     if (quit) {
-      return false;
+      return;
     }
 
     System.out.print("[LOGGED_OUT] >>> ");
@@ -100,15 +105,15 @@ public class Main {
     } else if (line.equals("quit")) {
       quit = true;
 
-      return false;
+      return;
     }
 
     System.out.printf("%n");
 
-    return true;
+    return;
   }
 
-  public static boolean postLogin() {
+  public static void postLogin() {
     System.out.print("[LOGGED_IN] >>> ");
 
     Scanner scanner = new Scanner(System.in);
@@ -157,7 +162,7 @@ public class Main {
 
           System.out.printf("Joined a game%n");
 
-          userInterface.drawBothChessBoards();
+          inGame = true;
         } else {
           System.out.printf("There was an error joining a game%n");
         }
@@ -191,11 +196,26 @@ public class Main {
     } else if (line.equals("quit")) {
       quit = true;
 
-      return false;
+      return;
     }
 
     System.out.printf("%n");
+  }
 
-    return true;
+  public static void game() {
+    userInterface.drawBothChessBoards();
+
+    System.out.printf("%n");
+
+    System.out.print("[IN_GAME] >>> ");
+
+    Scanner scanner = new Scanner(System.in);
+    String line = scanner.nextLine();
+
+    if (line.startsWith("help")) {
+      userInterface.printHelpInGame();
+    }
+
+    System.out.printf("%n");
   }
 }

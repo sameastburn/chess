@@ -112,4 +112,13 @@ public class UserInterface {
 
     drawChessBoard(exampleBoard, ChessGame.TeamColor.WHITE);
   }
+
+  public void printHelpInGame() {
+    out.printf("\thelp - display all options%n");
+    out.printf("\tredraw - redraws the chess board%n");
+    out.printf("\tleave - leave the game%n");
+    out.printf("\tmove - <PIECE> <POSITION> - move a piece at position to new position%n");
+    out.printf("\tresign - forfeit%n");
+    out.printf("\tmoves - display all visible moves%n");
+  }
 }
