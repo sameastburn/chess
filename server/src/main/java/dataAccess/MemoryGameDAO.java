@@ -17,7 +17,7 @@ public class MemoryGameDAO implements GameDAO {
     return games;
   }
 
-  private Optional<GameData> findGame(int gameID) {
+  public Optional<GameData> findGame(int gameID) {
     Optional<GameData> foundGame = games.stream().filter(game -> game.gameID == gameID).findFirst();
 
     return foundGame;

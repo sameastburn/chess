@@ -57,7 +57,7 @@ public class SQLGameDAO implements GameDAO {
     return games;
   }
 
-  private Optional<GameData> findGame(int gameID) {
+  public Optional<GameData> findGame(int gameID) {
     String sql = "SELECT * FROM games WHERE gameID = ?";
 
     try (var conn = DatabaseManager.getConnection()) {

@@ -1,15 +1,31 @@
 package server;
 
-import model.UserData;
-import org.eclipse.jetty.websocket.api.annotations.*;
-import org.eclipse.jetty.websocket.api.*;
-import spark.Spark;
 import com.google.gson.Gson;
+import dataAccessExceptions.GameBadGameIDException;
+import model.GameData;
+import org.eclipse.jetty.websocket.api.Session;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
+import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import service.GameService;
+import service.UserService;
+import webSocketMessages.serverMessages.LoadGameMessage;
+import webSocketMessages.userCommands.JoinPlayerCommand;
 import webSocketMessages.userCommands.UserGameCommand;
+
+import java.io.IOException;
 
 @WebSocket
 public class WebsocketHandler {
   private static final Gson gson = new Gson();
+  private static final UserService userService = UserService.getInstance();
+  private static final GameService gameService = GameService.getInstance();
+
+  public void sendLoadGame(Session session, GameData game) throws IOException {
+    LoadGameMessage loadGameMessage = new LoadGameMessage();
+    loadGameMessage.game = game;
+
+    session.getRemote().sendString(gson.toJson(game));
+  }
 
   @OnWebSocketMessage
   public void onMessage(Session session, String message) throws Exception {
@@ -17,15 +33,20 @@ public class WebsocketHandler {
     // session.getRemote().sendString("WebSocket response: " + message);
 
     try {
-      UserGameCommand userFromResponse = gson.fromJson(message, UserGameCommand.class);
+      UserGameCommand gameCommand = gson.fromJson(message, UserGameCommand.class);
 
-      switch (userFromResponse.getCommandType()) {
-        case JOIN_PLAYER:
-        {
+      switch (gameCommand.getCommandType()) {
+        case JOIN_PLAYER: {
+          JoinPlayerCommand joinCommand = gson.fromJson(message, JoinPlayerCommand.class);
+
           System.out.println("JOIN_PLAYER");
+
+          userService.authorize(joinCommand.getAuthString());
+
+          GameData gameNotNull = gameService.findGame(joinCommand.gameID).orElseThrow(() -> new GameBadGameIDException("User attempted to join a nonexistent game"));
+          sendLoadGame(session, gameNotNull);
         }
       }
-
     } catch (Exception e) {
       System.out.println(e);
     }

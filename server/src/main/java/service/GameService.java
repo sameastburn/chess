@@ -2,12 +2,12 @@ package service;
 
 import dataAccess.GameDAO;
 import dataAccess.GameException;
-import dataAccess.MemoryGameDAO;
 import dataAccess.SQLGameDAO;
 import model.GameData;
 import model.JoinGameRequest;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class GameService {
   private static final GameService instance = new GameService();
@@ -23,6 +23,10 @@ public class GameService {
 
   public ArrayList<GameData> listGames() {
     return gameDAO.listGames();
+  }
+
+  public Optional<GameData> findGame(int gameID) {
+    return gameDAO.findGame(gameID);
   }
 
   public int createGame(String gameName) {

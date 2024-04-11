@@ -4,9 +4,11 @@ import model.GameData;
 import model.JoinGameRequest;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 public interface GameDAO {
   public ArrayList<GameData> listGames();
+  public Optional<GameData> findGame(int gameID);
   public int createGame(String gameName);
   public void joinGame(String username, JoinGameRequest joinGameRequest) throws GameException;
   void clear();
