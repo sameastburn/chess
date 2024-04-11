@@ -14,21 +14,25 @@ import service.UserService;
 import webSocketMessages.serverMessages.ErrorMessage;
 import webSocketMessages.serverMessages.LoadGameMessage;
 import webSocketMessages.serverMessages.NotificationMessage;
-import webSocketMessages.userCommands.JoinObserverCommand;
-import webSocketMessages.userCommands.JoinPlayerCommand;
-import webSocketMessages.userCommands.MakeMoveCommand;
-import webSocketMessages.userCommands.UserGameCommand;
+import webSocketMessages.userCommands.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.HashSet;
 
 @WebSocket
 public class WebsocketHandler {
+  private static final WebsocketHandler instance = new WebsocketHandler();
   private static final Gson gson = new Gson();
   private static final UserService userService = UserService.getInstance();
   private static final GameService gameService = GameService.getInstance();
-  private final ConnectionManager connectionManager = new ConnectionManager();
+  private static final ConnectionManager connectionManager = new ConnectionManager();
+  private static final HashSet<Integer> resignedGames = new HashSet<Integer>();
+
+  public static WebsocketHandler getInstance() {
+    return instance;
+  }
 
   public void sendLoadGame(Session session, GameData game) throws IOException {
     LoadGameMessage loadGameMessage = new LoadGameMessage();
@@ -56,6 +60,10 @@ public class WebsocketHandler {
     errorMessage.errorMessage = "Error: " + message;
 
     session.getRemote().sendString(gson.toJson(errorMessage));
+  }
+
+  public void clearResignedGames() {
+    resignedGames.clear();
   }
 
   @OnWebSocketMessage
@@ -119,7 +127,13 @@ public class WebsocketHandler {
           System.out.println("MAKE_MOVE");
 
           MakeMoveCommand moveCommand = gson.fromJson(message, MakeMoveCommand.class);
-          GameData gameNotNull = gameService.findGame(moveCommand.gameID).orElseThrow(() -> new GameBadGameIDException("User attempted to make a move on a nonexistent game"));
+          Integer gameID = moveCommand.gameID;
+
+          GameData gameNotNull = gameService.findGame(gameID).orElseThrow(() -> new GameBadGameIDException("User attempted to make a move on a nonexistent game"));
+
+          if (resignedGames.contains(gameID)) {
+            throw new RuntimeException("Attempted to make a move in a game with a forfeit");
+          }
 
           String username = userService.getUsernameFromToken(moveCommand.getAuthString());
 
@@ -143,11 +157,33 @@ public class WebsocketHandler {
             }
           }
 
-          gameService.makeMove(moveCommand.gameID, moveCommand.move);
+          gameService.makeMove(gameID, moveCommand.move);
 
           broadcastLoadGame(gameNotNull);
 
           sendNotification(username, username + " made a move");
+
+          break;
+        } case RESIGN: {
+          ResignCommand resignCommand = gson.fromJson(message, ResignCommand.class);
+          int gameID = resignCommand.gameID;
+
+          String username = userService.getUsernameFromToken(resignCommand.getAuthString());
+
+          GameData gameNotNull = gameService.findGame(resignCommand.gameID).orElseThrow(() -> new GameBadGameIDException("User attempted to make a move on a nonexistent game"));
+          if (!(gameNotNull.whiteUsername.equals(username) || gameNotNull.blackUsername.equals(username))) {
+            throw new RuntimeException("Player not in game or observer tried to resign");
+          }
+
+          if (resignedGames.contains(gameID)) {
+            throw new RuntimeException("Player tried to resign in a game that was already finished");
+          }
+
+          sendNotification("", username + " resigned");
+
+          resignedGames.add(gameID);
+
+          break;
         }
       }
     } catch (Exception e) {

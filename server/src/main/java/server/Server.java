@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import org.eclipse.jetty.websocket.server.WebSocketHandler;
 import service.GameService;
 import service.UserService;
 import spark.Service;
@@ -13,6 +14,7 @@ import static spark.Service.ignite;
 public class Server {
   private static final UserService userService = UserService.getInstance();
   private static final GameService gameService = GameService.getInstance();
+  private static final WebsocketHandler webSocketHandler = WebsocketHandler.getInstance();
 
   public int run(int desiredPort) {
     Service http = ignite();
@@ -47,5 +49,6 @@ public class Server {
   public void clear() {
     userService.clear();
     gameService.clear();
+    webSocketHandler.clearResignedGames();
   }
 }
