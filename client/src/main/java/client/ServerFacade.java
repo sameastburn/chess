@@ -112,6 +112,7 @@ public class ServerFacade extends Endpoint {
 
       //MessageHandler is not a functional interface :(
       this.session.addMessageHandler(new MessageHandler.Whole<String>() {
+        @Override
         public void onMessage(String message) {
           onMessageFacade(message);
         }
