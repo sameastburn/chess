@@ -32,7 +32,7 @@ public class SQLAuthDao implements AuthDAO {
 
   public SQLAuthDao() {
     try {
-      configureDatabase();
+      DatabaseManager.configureDatabase(createStatements);
     } catch (DataAccessException e) {
       throw new RuntimeException(e);
     }
@@ -218,22 +218,8 @@ public class SQLAuthDao implements AuthDAO {
         preparedStatementEnableChecks.executeUpdate();
       }
 
-      configureDatabase();
+      DatabaseManager.configureDatabase(createStatements);
     } catch (SQLException | DataAccessException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  private void configureDatabase() throws DataAccessException {
-    DatabaseManager.createDatabase();
-
-    try (var conn = DatabaseManager.getConnection()) {
-      for (var statement : createStatements) {
-        try (var preparedStatement = conn.prepareStatement(statement)) {
-          preparedStatement.executeUpdate();
-        }
-      }
-    } catch (SQLException e) {
       throw new RuntimeException(e);
     }
   }

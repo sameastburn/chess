@@ -249,6 +249,10 @@ public class ChessPiece {
     return moves;
   }
 
+  private boolean isValidPosition(int col, int row) {
+    return col >= 1 && col <= 8 && row >= 1 && row <= 8;
+  }
+
   private Collection<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition) {
     var moves = new HashSet<ChessMove>();
 
@@ -297,7 +301,7 @@ public class ChessPiece {
     int newCol = col + 1;
 
     newEndPosition = new ChessPosition(newRow, newCol);
-    if (newCol >= 1 && newCol <= 8 && newRow >= 1 && newRow <= 8 && board.hasPieceAt(newEndPosition)) {
+    if (isValidPosition(newRow, newCol) && board.hasPieceAt(newEndPosition)) {
       var capturePiece = board.getPiece(newEndPosition);
 
       if (capturePiece.getTeamColor() != thisColor) {
@@ -315,7 +319,7 @@ public class ChessPiece {
     newCol = col - 1;
 
     newEndPosition = new ChessPosition(newRow, newCol);
-    if (!(newCol < 1 || newCol > 8 || newRow < 1 || newRow > 8) && board.hasPieceAt(newEndPosition)) {
+    if (isValidPosition(newRow, newCol) && board.hasPieceAt(newEndPosition)) {
       var capturePiece = board.getPiece(newEndPosition);
 
       if (capturePiece.getTeamColor() != thisColor) {
