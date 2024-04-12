@@ -75,13 +75,13 @@ public class Main {
 
             loggedIn = true;
           } else {
-            System.out.printf("There was an error logging in%n");
+            System.out.println("There was an error logging in");
           }
         } else {
-          System.out.printf("There was an error registering%n");
+          System.out.println("There was an error registering");
         }
       } else {
-        System.out.printf("Not enough arguments provided for register%n");
+        System.out.println("Not enough arguments provided for register");
       }
     } else if (line.startsWith("login")) {
       String[] loginArguments = line.split(" ");
@@ -97,10 +97,10 @@ public class Main {
 
           loggedIn = true;
         } else {
-          System.out.printf("There was an error logging in%n");
+          System.out.println("There was an error logging in");
         }
       } else {
-        System.out.printf("Not enough arguments provided for login%n");
+        System.out.println("Not enough arguments provided for login");
       }
     } else if (line.equals("help")) {
       userInterface.printHelpPreLogin();
@@ -162,8 +162,6 @@ public class Main {
           for (var game : games) {
             System.out.println(game.gameID + " | " + game.gameName + " | " + game.whiteUsername + " | " + game.blackUsername);
           }
-        } else {
-          System.out.printf("There was an error listing the games%n");
         }
       } else if (line.startsWith("join")) {
         String[] joinArguments = line.split(" ");
@@ -187,8 +185,6 @@ public class Main {
             waitTilReceivedGame();
 
             System.out.println("Joined a game");
-          } else {
-            System.out.printf("There was an error joining a game%n");
           }
         } else {
           System.out.printf("Not enough arguments provided for join%n");
@@ -212,11 +208,9 @@ public class Main {
             inGame = true;
 
             waitTilReceivedGame();
-          } else {
-            System.out.printf("There was an error joining a game as an observer%n");
           }
         } else {
-          System.out.printf("Not enough arguments provided for observe%n");
+          System.out.println("Not enough arguments provided for observe");
         }
       } else if (line.startsWith("logout")) {
         loggedIn = false;
