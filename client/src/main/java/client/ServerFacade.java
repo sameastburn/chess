@@ -145,6 +145,13 @@ public class ServerFacade extends Endpoint {
     send(joinCommand);
   }
 
+  public void observeGame(Integer gameID) {
+    JoinObserverCommand observeCommand = new JoinObserverCommand(authToken);
+    observeCommand.gameID = gameID;
+
+    send(observeCommand);
+  }
+
   public void leave() {
     LeaveCommand leaveCommand = new LeaveCommand(authToken);
     leaveCommand.gameID = gameID;

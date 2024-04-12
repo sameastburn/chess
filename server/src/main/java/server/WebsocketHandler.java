@@ -17,10 +17,7 @@ import webSocketMessages.serverMessages.NotificationMessage;
 import webSocketMessages.userCommands.*;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.HashSet;
-import java.util.Map;
 
 @WebSocket
 public class WebsocketHandler {
@@ -138,6 +135,10 @@ public class WebsocketHandler {
 
           GameData gameNotNull = gameService.findGame(gameID).orElseThrow(() -> new GameBadGameIDException("User attempted to make a move on a nonexistent game"));
 
+          if (gameNotNull.whiteUsername == null && gameNotNull.blackUsername == null) {
+            throw new RuntimeException("Attempted to make a move in a game with no players, or as observer");
+          }
+
           if (resignedGames.contains(gameID)) {
             throw new RuntimeException("Attempted to make a move in a game with a resignation");
           }
@@ -154,11 +155,11 @@ public class WebsocketHandler {
           // this could probably be abstracted into gameService but this is the solution for now
           if (pieceColor == ChessGame.TeamColor.WHITE) {
             if (gameNotNull.whiteUsername != null && !gameNotNull.whiteUsername.equals(username)) {
-              throw new RuntimeException("Player with black pieces tried to move for opponent!");
+              throw new RuntimeException("Player with black pieces tried to move for opponent, or observer");
             }
           } else if (pieceColor == ChessGame.TeamColor.BLACK) {
             if (gameNotNull.blackUsername != null && !gameNotNull.blackUsername.equals(username)) {
-              throw new RuntimeException("Player with white pieces tried to move for opponent!");
+              throw new RuntimeException("Player with white pieces tried to move for opponent, or observer");
             }
           }
 
@@ -177,6 +178,10 @@ public class WebsocketHandler {
           int gameID = resignCommand.gameID;
 
           GameData gameNotNull = gameService.findGame(resignCommand.gameID).orElseThrow(() -> new GameBadGameIDException("User attempted to make a move on a nonexistent game"));
+          if (gameNotNull.whiteUsername == null || gameNotNull.blackUsername == null) {
+            throw new RuntimeException("Player not in game or observer tried to resign");
+          }
+
           if (!(gameNotNull.whiteUsername.equals(username) || gameNotNull.blackUsername.equals(username))) {
             throw new RuntimeException("Player not in game or observer tried to resign");
           }
@@ -207,12 +212,7 @@ public class WebsocketHandler {
         }
       }
     } catch (Exception e) {
-      System.out.println(e);
-
-      StringWriter sw = new StringWriter();
-      e.printStackTrace(new PrintWriter(sw));
-
-      sendError(session, sw.toString());
+      sendError(session, e.getMessage());
     }
   }
 }

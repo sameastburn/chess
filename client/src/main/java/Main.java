@@ -176,6 +176,8 @@ public class Main {
           boolean joinSuccess = serverFacade.join(playerColor, gameId);
 
           if (joinSuccess) {
+            System.out.println(EscapeSequences.ERASE_SCREEN);
+
             serverFacade.joinGame(gameId, colorAsEnum);
 
             userInterface.myTeamColor = colorAsEnum;
@@ -184,7 +186,7 @@ public class Main {
 
             waitTilReceivedGame();
 
-            System.out.println(EscapeSequences.ERASE_SCREEN + "Joined a game");
+            System.out.println("Joined a game");
           } else {
             System.out.printf("There was an error joining a game%n");
           }
@@ -204,7 +206,12 @@ public class Main {
 
             System.out.printf("Joined a game as an observer%n");
 
+            serverFacade.observeGame(gameId);
+
             userInterface.observing = true;
+            inGame = true;
+
+            waitTilReceivedGame();
           } else {
             System.out.printf("There was an error joining a game as an observer%n");
           }
