@@ -300,15 +300,15 @@ public class ChessPiece {
     // first diagonal check
     int newCol = col + 1;
 
-    newEndPosition = new ChessPosition(newRow, newCol);
-    if (isValidPosition(newRow, newCol) && board.hasPieceAt(newEndPosition)) {
-      var capturePiece = board.getPiece(newEndPosition);
+    var newEndPositionFirst = new ChessPosition(newRow, newCol);
+    if (isValidPosition(newRow, newCol) && board.hasPieceAt(newEndPositionFirst)) {
+      var capturePiece = board.getPiece(newEndPositionFirst);
 
       if (capturePiece.getTeamColor() != thisColor) {
         if (isPromotionRow) {
-          pawnAddPromotionMoves(moves, myPosition, newEndPosition);
+          pawnAddPromotionMoves(moves, myPosition, newEndPositionFirst);
         } else {
-          var newMove = new ChessMove(myPosition, newEndPosition, null);
+          var newMove = new ChessMove(myPosition, newEndPositionFirst, null);
 
           moves.add(newMove);
         }
@@ -318,15 +318,15 @@ public class ChessPiece {
     // second diagonal check
     newCol = col - 1;
 
-    newEndPosition = new ChessPosition(newRow, newCol);
-    if (isValidPosition(newRow, newCol) && board.hasPieceAt(newEndPosition)) {
-      var capturePiece = board.getPiece(newEndPosition);
+    var newEndPositionSecond = new ChessPosition(newRow, newCol);
+    if (isValidPosition(newRow, newCol) && board.hasPieceAt(newEndPositionSecond)) {
+      var capturePiece = board.getPiece(newEndPositionSecond);
 
       if (capturePiece.getTeamColor() != thisColor) {
         if (isPromotionRow) {
-          pawnAddPromotionMoves(moves, myPosition, newEndPosition);
+          pawnAddPromotionMoves(moves, myPosition, newEndPositionSecond);
         } else {
-          var newMove = new ChessMove(myPosition, newEndPosition, null);
+          var newMove = new ChessMove(myPosition, newEndPositionSecond, null);
 
           moves.add(newMove);
         }
